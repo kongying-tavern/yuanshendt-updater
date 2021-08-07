@@ -1,0 +1,3 @@
+Temp
+*.user
+*.user.*

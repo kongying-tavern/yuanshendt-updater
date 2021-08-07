@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/UpdateProgram"/>
+    <qresource prefix="/BackgroundImage">
+        <file>Resource/bg2.png</file>
+        <file>Resource/MainIcon.ico</file>
+    </qresource>
+    <qresource prefix="/TitleButtonImage">
+        <file>Resource/TitlePudhButtonStyle/bexit0.png</file>
+        <file>Resource/TitlePudhButtonStyle/bexit1.png</file>
+        <file>Resource/TitlePudhButtonStyle/bmin0.png</file>
+        <file>Resource/TitlePudhButtonStyle/bmin1.png</file>
+    </qresource>
+    <qresource prefix="/CRT">
+        <file>Resource/crt/curl-ca-bundle.crt</file>
+    </qresource>
+</RCC>

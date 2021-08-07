@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>730</width>
+    <height>522</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>730</width>
+    <height>522</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>730</width>
+    <height>522</height>
+   </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="tabletTracking">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>空荧酒馆在线下载&amp;更新器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="UpdateProgram.qrc">
+    <normaloff>:/BackgroundImage/Resource/MainIcon.ico</normaloff>:/BackgroundImage/Resource/MainIcon.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="MainPage">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>410</y>
+      <width>710</width>
+      <height>102</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:rgb(255,255,255);</string>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="page_Dling">
+     <widget class="QLabel" name="label_Text">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>35</y>
+        <width>651</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>-1</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+color:rgb(58, 59, 64);
+font-size:16px;
+}</string>
+      </property>
+      <property name="text">
+       <string>资源下载中 32%...</string>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>56</y>
+        <width>650</width>
+        <height>10</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QProgressBar{
+background:rgb(235, 235, 235);
+color:rgba(255, 255, 255, 0);
+border:1px solid rgb(235, 235, 235);
+border-radius:3px;
+} 
+QProgressBar::chunk{
+border-radius:3px;
+background:rgb(58, 59, 64);
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="textVisible">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_Button">
+     <widget class="QPushButton" name="pushButton_Start">
+      <property name="geometry">
+       <rect>
+        <x>224</x>
+        <y>27</y>
+        <width>262</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>-1</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+background-color:rgb(57, 59, 64);
+border:none;
+font-size:18px;
+color:rgb(244, 216, 168);
+border-radius:4px;
+}
+QPushButton:hover {
+background-color:rgb(77, 79, 83);
+}
+QPushButton:pressed {
+background-color:rgb(57, 59, 64);
+}</string>
+      </property>
+      <property name="text">
+       <string>选择安装目录</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label_GB">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>710</width>
+      <height>400</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-image:url(:/BackgroundImage/Resource/bg2.png);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_Mini">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>10</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+background:rgba(255, 255, 255, 0);
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bmin0.png);
+}
+QPushButton:hover {
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bmin1.png);
+}
+QPushButton:pressed {
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bmin1.png);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_Exit">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>10</y>
+      <width>30</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="mouseTracking">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+background:rgba(255, 255, 255, 0);
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bexit0.png);
+}
+QPushButton:hover{
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bexit1.png);
+}
+QPushButton:pressed{
+border:none;
+background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bexit1.png);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Shadow">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>710</width>
+      <height>500</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑 Light</family>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:rgb(102,204,255);</string>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+    <property name="text">
+     <string>看到这个说明出了点问题，如果更新器没崩溃的话还请您手动重开</string>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>label_Shadow</zorder>
+   <zorder>MainPage</zorder>
+   <zorder>label_GB</zorder>
+   <zorder>pushButton_Exit</zorder>
+   <zorder>pushButton_Mini</zorder>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>pushButton_Mini</tabstop>
+  <tabstop>pushButton_Exit</tabstop>
+  <tabstop>pushButton_Start</tabstop>
+ </tabstops>
+ <resources>
+  <include location="UpdateProgram.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButton_Mini</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showMinimized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>660</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>725</x>
+     <y>196</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
