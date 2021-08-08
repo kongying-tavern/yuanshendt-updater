@@ -83,14 +83,14 @@ int httpDownLoad(QString URL,QString Path)
         {
             curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
             curl_easy_perform(handle);//阻塞,等待文件写入
-            reint = fclose(pagefile);
-            if(reint!=0)QMessageBox::warning(NULL,"写出文件","错误:"+QString::number(curl_easy_perform(handle)));
+            reint = fclose(pagefile);            
+            if(reint!=0)QMessageBox::warning(NULL,"写出文件","错误:"+QString::number(reint));
         }else{
             reint = -2;
         }
         reint = 0;
-    } else {
-    if(reint!=0)QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curl_easy_perform(handle)));
+    } else {        
+        QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curl_easy_perform(handle)));
         reint = -3;
     }
 
