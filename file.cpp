@@ -147,7 +147,11 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
 }
 bool moveFile(QString oldPath,QString newPath)
 {
-    QFile file(oldPath);
+    QFile file(newPath);
+    if(!file.remove())
+    {
+        qDebug()<<"moveFile?.?";
+    }
     if(file.isOpen())
     {
         qDebug()<<"文件占用?.?尝试复制文件";
