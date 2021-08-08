@@ -204,7 +204,7 @@ void Start::work()
 
         if(moveFile(oldPath,newPath)==false)
         {
-            qDebug()<<"移动文件错误";
+            QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
         }
 
     }
