@@ -76,13 +76,13 @@ int httpDownLoad(QString URL,QString Path)
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(handle, CURLOPT_CAINFO, tem.toStdString().c_str());/* 证书路径 */
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);//收到数据反调
-
-    if (curl_easy_perform(handle) == CURLE_OK)
+    int curlreint=curl_easy_perform(handle);
+    if (curlreint == CURLE_OK)
     {
         if (pagefile)
         {
             curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
-            curl_easy_perform(handle);//阻塞,等待文件写入
+            curl_easy_perform(handle);//
             reint = fclose(pagefile);            
             if(reint!=0)QMessageBox::warning(NULL,"写出文件","错误:"+QString::number(reint));
         }else{
@@ -90,7 +90,7 @@ int httpDownLoad(QString URL,QString Path)
         }
         reint = 0;
     } else {        
-        QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curl_easy_perform(handle)));
+        QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curlreint));
         reint = -3;
     }
 
