@@ -154,7 +154,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
         QProcess process(this);
         process.setProgram("cmd");
         QStringList argument;
-        argument << "/c" <<"start"<<""""<<workPath+"/Map.exe";
+        argument << "/c" <<"start"<<""""<<workPath+"\\Map.exe";
         process.setArguments(argument);
         if(process.startDetached())
         {
