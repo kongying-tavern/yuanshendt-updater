@@ -57,7 +57,10 @@ void Start::work()
     tempPath=tempPath+updaterTempDir;
     qDebug()<<"临时文件夹:"<<tempPath;
     createFolderSlot(tempPath);
+    /*再临时目录释放crt证书*/
+    httpcrt();
     /*遍历目录*/
+
     QStringList localFileList;//创建字符串数组
     /*读取本地文件MD5**************************************************/
 

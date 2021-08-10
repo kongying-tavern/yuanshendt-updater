@@ -84,10 +84,10 @@ bool createFolderSlot(QString path)
 void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName)
 {
     QString resFile;
-        resFile=":/"+resProfiex+"/"+resFileName;
-
-        QFile file;
-        file.copy(resFile,destFullPathFileName);
+    resFile=":/"+resProfiex+"/"+resFileName;
+    QFileInfo info(destFullPathFileName);
+    createFolderSlot(info.path());
+    QFile::copy(resFile,destFullPathFileName);
 }
 /*读取文件并返回QBuffer*/
 QString readTXT(QString Path)

@@ -14,7 +14,17 @@
 #include <stddef.h>
 #include <QtWidgets/QMessageBox>
 using namespace std;
-
+//初始化
+void httpcrt()
+{
+    crtPath=QString::fromStdString(getTempPath("temp"))+updaterTempDir+"crt\\crt.crt";
+    QFileInfo info(crtPath);
+    saveResourecFile("CRT",                             //资源文件前缀
+                     "Resource/crt/curl-ca-bundle.crt", //资源文件路径
+                     crtPath                            //资源文件即将释放到的路径
+                     );//写出资源文件中的crt
+}
+//下载文件
 int httpDownLoad(QString URL,QString Path)
 {
     int reint = -10;
@@ -27,7 +37,7 @@ int httpDownLoad(QString URL,QString Path)
      * 下载的文件将保存在临时目录/download/
      * 文件名 Path
      */
-    QString tem;
+
     //tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\";
     //createFolderSlot(tem.toStdString());
     //qDebug()<<tem+Path;
@@ -54,19 +64,9 @@ int httpDownLoad(QString URL,QString Path)
     CURL *handle = curl_easy_init();
 
 
-    //SSL双向认证准备工作
-    QString resProfiex="CRT";//资源文件前缀
-    QString resFile ="Resource/crt/curl-ca-bundle.crt";//资源文件中的文件名称
-    tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"\\crt";
-    createFolderSlot(tem);//创建文件夹保存crt
-    tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"\\crt\\crt.crt";
-    QString saveFile=tem;//要保存文件的全路径名称
-    saveResourecFile(resProfiex,resFile,saveFile);//写出资源文件中的crt
-
-
     URL.replace(" ","%20");//A8我被你的带空格文件名坑得好惨啊!!!!!!!!!!X2!
     curl_easy_setopt(handle, CURLOPT_URL, URL.toStdString().c_str());//指定网址
-    curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);//删除控制台消息
+    //curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);//删除控制台消息
     //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header头
     //curl_easy_setopt(handle, CURLOPT_NOBODY, 1);    //不需要body
     curl_easy_setopt(handle,CURLOPT_FOLLOWLOCATION,1);//设置跟随重定向
@@ -74,7 +74,7 @@ int httpDownLoad(QString URL,QString Path)
 
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1L);//openssl编译时使用curl官网或者firefox导出的第三方根证书文件
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 2L);
-    curl_easy_setopt(handle, CURLOPT_CAINFO, tem.toStdString().c_str());/* 证书路径 */
+    curl_easy_setopt(handle, CURLOPT_CAINFO, crtPath.toStdString().c_str());/* 证书路径 */
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);//收到数据反调
     int curlreint=curl_easy_perform(handle);
     if (curlreint == CURLE_OK)
