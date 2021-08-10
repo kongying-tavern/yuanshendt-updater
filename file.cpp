@@ -89,11 +89,11 @@ void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPat
     createFolderSlot(info.path());
     QFile::copy(resFile,destFullPathFileName);
 }
-/*读取文件并返回QBuffer*/
+/*读取文件并返回json字符串*/
 QString readTXT(QString Path)
 {
     qDebug()<<"读取文件"<<Path;
-    QFile file(Path);
+    QFile file(Path.replace("\\","/"));
     QString TXT;
    // qDebug()<<"已被打开"<<file.isOpen();
     if(!file.open(QIODevice::ReadOnly))
@@ -147,6 +147,11 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
 }
 bool moveFile(QString oldPath,QString newPath)
 {
+    oldPath.replace("\\","/");
+    newPath.replace("\\","/");
+    qDebug()<<"oldPath:"<<oldPath;
+    qDebug()<<"newPath:"<<newPath;
+
     QFile nfile(newPath);
 
     if(!nfile.remove())
@@ -167,6 +172,6 @@ bool moveFile(QString oldPath,QString newPath)
 }
 QString dp0()
 {
-    return QCoreApplication::applicationDirPath().replace("/","\\");
+    return QCoreApplication::applicationDirPath();
 }
 

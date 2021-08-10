@@ -41,7 +41,7 @@ void Start::work()
     //return;
     //return;
     /*前期工作********************************************************/
-    /*获取系统环境变量temp*/
+    /*获取系统环境变量temp*///已知中文用户名会出问题
     MainWindow::mutualUi->changeMainPage0label_Text("初始化...");
     emit tworkProcess(1,2);
     MainWindow::mutualUi->changeProgressBarColor(
@@ -49,6 +49,7 @@ void Start::work()
                 ,QString("rgb(58, 59, 64)"));
     QString tempPath;
     tempPath=QString::fromStdString(getTempPath("temp"));
+    qDebug()<<"临时目录:"<<tempPath;
     /*
     cout<<url<<endl;
     cout<<urlMap<<endl;
@@ -57,7 +58,7 @@ void Start::work()
     tempPath=tempPath+updaterTempDir;
     qDebug()<<"临时文件夹:"<<tempPath;
     createFolderSlot(tempPath);
-    /*再临时目录释放crt证书*/
+    /*在临时目录释放crt证书*/
     httpcrt();
     /*遍历目录*/
 
@@ -70,15 +71,13 @@ void Start::work()
     //return;
     emit tworkProcess(0,1);
     /*获取本地文件MD5*/
-    //qDebug()<<exeIsRunning();
-    if(exeIsRunning()==false){return;}
     QStringList localFileListMD5;
     MainWindow::mutualUi->changeProgressBarColor(
                 QString("rgb(235, 235, 235)")
                 ,QString("rgb(58, 59, 64)"));
     for(int i = 0; i< localFileList.size();++i)
     {
-        if(exeIsRunning()==false){return;}
+
         MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+localFileList.at(i));
         emit tworkProcess(i,localFileList.size());
 
@@ -96,7 +95,7 @@ void Start::work()
      * url  dlurl"md5.json"
      * path "md5.json"
      */
-    if(exeIsRunning()==false){return;}
+
     MainWindow::mutualUi->changeMainPage0label_Text("获取在线文件MD5...");
     httpDownLoad(dlurl"md5.json","md5.json");
 
@@ -107,7 +106,7 @@ void Start::work()
     QString newMD5Str;
     QStringList newFileList;
     QStringList newFileMD5;
-    qDebug()<<tempPath<<"download\\md5.json";
+    //qDebug()<<tempPath<<"download\\md5.json";
     newMD5Str = readTXT(tempPath+"download\\md5.json");
     qDebug()<<"开始转换成QSL";
     jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
@@ -119,7 +118,7 @@ void Start::work()
       * 旧文件列表-MD5 QStringList localFileListMD5
       * 新文件列表-MD5 QStringList newFileMD5
       */
-    if(exeIsRunning()==false){return;}
+
     MainWindow::mutualUi->changeMainPage0label_Text("对比需要更新的文件");
     emit tworkProcess(0,1);
     Sleep(300);
@@ -145,7 +144,6 @@ void Start::work()
      * 下载文件前需要对字符串做很多工作
      * 一是反斜杠转斜杠并删除第一个斜杠
      */
-     if(!exeIsRunning()){return;}
      QString tem;
      MainWindow::mutualUi->changeProgressBarColor(
                  QString("#3880cc")
@@ -159,9 +157,9 @@ void Start::work()
         QString dlpath="Map\\"+QString(needUpdate.at(i)).replace("/","\\");
         qDebug()<<"downloadurl :"<<url;
         qDebug()<<"downloadpath:"<<dlpath;
-        qDebug()<<exeIsRunning();
+
         //QMessageBox::information(NULL,QString::number(i),dlpath);
-        if(exeIsRunning()==false){return;}
+
         MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
         emit tworkProcess(i,needUpdate.size());
 
@@ -185,7 +183,7 @@ void Start::work()
 
     for(int i = 0; i< needUpdate.size();++i)
     {
-        if(exeIsRunning()==false){return;}
+
         //qDebug()<<"开始下载:"<<needUpdate.at(i);
 
         emit tworkProcess(i,needUpdate.size());
@@ -194,8 +192,7 @@ void Start::work()
         QString oldPath=QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+"Map\\"+QString(needUpdate.at(i)).replace("/","\\");
         QString newPath=path+"\\"+QString(needUpdate.at(i)).replace("/","\\");
 
-        qDebug()<<"oldPath:"<<oldPath;
-        qDebug()<<"newPath:"<<newPath;
+
         MainWindow::mutualUi->changeMainPage0label_Text(
                     QString::number(i)+
                     QString::number(needUpdate.size())+

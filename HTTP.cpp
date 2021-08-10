@@ -13,6 +13,7 @@
 #include <Sandefine.h>
 #include <stddef.h>
 #include <QtWidgets/QMessageBox>
+#include <QTextCodec>
 using namespace std;
 //初始化
 void httpcrt()
@@ -52,11 +53,31 @@ int httpDownLoad(QString URL,QString Path)
     //FILE *pagefile= fopen((QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path).toStdString().c_str(), "wb");
     FILE *pagefile=NULL;
     int err;
-    err = fopen_s(&pagefile
-                      ,(QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path).toStdString().c_str()
-                      ,"wb"
+    err = fopen_s(&pagefile,
+                  (QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path).toStdString().c_str()
+                  ,"wb"
+                  );
+    if(err!=0)
+    {
+        qDebug()<<"尝试用GB2312编码打开文件";
+        string  bmpName = (
+                    QString::fromStdString(getTempPath("temp"))
+                    +updaterTempDir
+                    +"download\\"
+                    +Path
+                    )
+                    .toStdString();
+
+        QTextCodec *code = QTextCodec::codecForName("GB2312");
+        std::string name = code->fromUnicode(bmpName.c_str()).data();
+
+        err = fopen_s(&pagefile,
+                      name.c_str(),
+                      "wb"
                       );
-    qDebug()<<"打开的文件句柄"<<pagefile<<"|"<<err;
+
+    }
+    qDebug()<<"打开的文件句柄"<<&pagefile<<"|"<<err;
     //Sleep(10000);
 
 
