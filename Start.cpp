@@ -8,16 +8,15 @@
 #include <QFileInfo>
 #include "file.h"
 #include "MD5.h"
-#include "HTTP.h"
+
 #include "Sandefine.h"
 #include "Json.h"
 #include "mainwindow.h"
 
+
 Start::Start(QString dir, QObject *parent)
     : QObject(parent)
 {
-    qDebug()<<dir;
-    //return;
     workProcess = new QThread;
     moveToThread(workProcess);
     workProcess->start();
@@ -31,24 +30,35 @@ Start::~Start()
 }
 
 
+void Start::dlworking(QString txt)
+{
+    //qDebug()<<txt;
+    threadWorking = txt;
+}
+QString tNowWork()
+{
+    return threadWorking;
+}
+
 void Start::work()
 {
+
+    //mutualStart = this;
     QString path=this->dir;
-    qDebug()<<"老地方:"<<path;
     //return;
     MainWindow::mutualUi->changeMainPage(0);
     qDebug()<<"工作目标："<<path;
     //return;
     //return;
     /*前期工作********************************************************/
-    /*获取系统环境变量temp*///已知中文用户名会出问题
+    /*获取系统环境变量temp*/
     MainWindow::mutualUi->changeMainPage0label_Text("初始化...");
     emit tworkProcess(1,2);
     MainWindow::mutualUi->changeProgressBarColor(
                 QString("rgb(235, 235, 235)")
                 ,QString("rgb(58, 59, 64)"));
     QString tempPath;
-    tempPath=QString::fromStdString(getTempPath("temp"));
+    tempPath=getTempPath("temp");
     qDebug()<<"临时目录:"<<tempPath;
     /*
     cout<<url<<endl;
@@ -106,10 +116,12 @@ void Start::work()
     QString newMD5Str;
     QStringList newFileList;
     QStringList newFileMD5;
-    //qDebug()<<tempPath<<"download\\md5.json";
-    newMD5Str = readTXT(tempPath+"download\\md5.json");
+    //qDebug()<<tempPath<<"download/md5.json";
+    newMD5Str = readTXT(tempPath+"download/md5.json");
     qDebug()<<"开始转换成QSL";
     jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
+
+//    return;
     /*文件对比********************************************************/
     /*
       * 获取需要更新的文件
@@ -154,7 +166,7 @@ void Start::work()
         //qDebug()<<"开始下载:"<<needUpdate.at(i);
         //构造下载链接
         QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
-        QString dlpath="Map\\"+QString(needUpdate.at(i)).replace("/","\\");
+        QString dlpath="Map/"+QString(needUpdate.at(i));
         qDebug()<<"downloadurl :"<<url;
         qDebug()<<"downloadpath:"<<dlpath;
 
@@ -184,30 +196,41 @@ void Start::work()
     for(int i = 0; i< needUpdate.size();++i)
     {
 
-        //qDebug()<<"开始下载:"<<needUpdate.at(i);
 
-        emit tworkProcess(i,needUpdate.size());
+
 
         //构造新旧文件名
-        QString oldPath=QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+"Map\\"+QString(needUpdate.at(i)).replace("/","\\");
-        QString newPath=path+"\\"+QString(needUpdate.at(i)).replace("/","\\");
-
-
+        QString oldPath=getTempPath("temp")+
+                updaterTempDir+
+                "download/"+"Map/"+
+                QString(needUpdate.at(i))
+                ;
+        QString newPath=path+
+                "/"+
+                QString(needUpdate.at(i))
+                ;
+        //qDebug()<<"oldPath:"<<oldPath;
+        //qDebug()<<"newPath:"<<newPath;
+        qDebug()<<QString::number(i+1)+
+                  "|"+
+                  QString::number(needUpdate.size())
+                  ;
         MainWindow::mutualUi->changeMainPage0label_Text(
-                    QString::number(i)+
+                    QString::number(i+1)+
+                    "|"+
                     QString::number(needUpdate.size())+
-                    "正在移动文件:"+
+                    " 正在移动文件:"+
                     needUpdate.at(i)
                     );
         QFileInfo info(newPath);
         createFolderSlot(info.path());
 
-        if(moveFile(oldPath,newPath)==false)
+        if(!moveFile(oldPath,newPath))
         {
             qDebug()<<"移动失败";
             //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
         }
-
+        emit tworkProcess(i,needUpdate.size());
     }
     emit tworkProcess(1,1);
     MainWindow::mutualUi->changeMainPage0label_Text("所有工作结束,可关闭下载器");

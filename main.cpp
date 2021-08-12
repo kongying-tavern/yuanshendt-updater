@@ -1,4 +1,3 @@
-#include "mainwindow.h"
 #include <QApplication>
 #include "HTTP.cpp"
 #include "MD5.cpp"

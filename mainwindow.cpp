@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QPropertyAnimation>
+#include <HTTP.h>
 
 
 bool windowsMoveOn;
@@ -37,13 +38,13 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
         ui->label_Shadow->setGraphicsEffect(shadow);
 
 
-    if(pathStr == 0)
+    if(pathStr == nullptr)
     {
         MainWindow::mutualUi->changeMainPage(1);//无路径传参,显示选择路径按钮
 
     }else{
         QFileInfo info(pathStr);
-        workPath=info.path().replace("/","\\");
+        workPath=info.path();
         qDebug()<<"workPath:"<<workPath;
         threadWork(workPath);
     }
@@ -75,21 +76,17 @@ void MainWindow::Work_Process(int a,int b)
     animation->setEasingCurve(QEasingCurve::InOutQuad);
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
+void MainWindow::Work_Dlnow(QString txt)
+{
+    ui->label_Dlnow->setText(txt);
+}
+
 void MainWindow::changeProgressBarValue(int a,int b)//修改进度条进度//极容易崩溃!
 {
 
     int c=(int)(100*(float(a)/float(b)));
     qDebug()<<"进度条"<<ui->progressBar->value()<<"|"<<c;
     ui->progressBar->setValue(c);
-/*
-    QPropertyAnimation * animation =new QPropertyAnimation(ui->progressBar, "value");
-    animation->setDuration(300);
-    animation->setStartValue(ui->progressBar->value());
-    animation->setEndValue(c);
-    animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
-    //delete animation;
-*/
     Sleep(10);
 }
 
@@ -114,9 +111,9 @@ void MainWindow::mousePressEvent(QMouseEvent *e)  // 鼠标按下触发记录当
 
     if(e->button()==Qt::LeftButton)
     {
-        clickPos=e->globalPos();
-        //clickGlobal=e
-
+        clickPos=e->pos();
+        //qDebug()<<this->pos();
+        //qDebug()<<e->pos();
         windowsMoveOn=true;
     }
 }
@@ -124,8 +121,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)  // 移动窗口(根据windowsMo
 {    
     if(windowsMoveOn){
         //qDebug()<<e;
-        move(this->pos()+e->globalPos()-clickPos);
-        clickPos=e->globalPos();
+        move(this->pos()+e->pos()-clickPos);
+        //clickPos=this->pos();
 
     }
 }
@@ -150,11 +147,11 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
     if(alldone)
     {
 
-        qDebug()<<QString(workPath+"/Map.exe").replace("/","\\");
+        qDebug()<<QString(workPath+"/Map.exe");
         QProcess process(this);
         process.setProgram("cmd");
         QStringList argument;
-        argument << "/c" <<"start"<<""""<<workPath+"\\Map.exe";
+        argument << "/c" <<"start"<<""""<<workPath+"/Map.exe";
         process.setArguments(argument);
         if(process.startDetached())
         {
@@ -178,7 +175,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
                     "./",
                     QFileDialog::ShowDirsOnly
                 );
-        dir.replace("/","\\");
+        //dir.replace("/","\\");
         tem =dir.toStdString();
         qDebug()<<dir;
         if(string(tem)==""){
@@ -197,11 +194,6 @@ void MainWindow::threadWork(QString path)
     //QtConcurrent::run(this,&MainWindow::startThread,path);
     MainWindow::startThread(path);
 }
-bool exeIsRunning()
-{
-    qDebug()<<"chackIsRunning:"<<updaterIsRunning;
-    return updaterIsRunning;
-}
 void MainWindow::startThread(QString path)
 {
     ui->MainPage->setCurrentIndex(0);
@@ -217,10 +209,21 @@ void MainWindow::startThread(QString path)
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
     connect(ttstart, &Start::tworkProcess, this, &MainWindow::Work_Process);
     connect(ttstart, &Start::tworkFinished, this, &MainWindow::Work_Finished);
-    //进度条文字变换，如果有的话
-    //connect(ui.progressBar, &QProgressBar::valueChanged, this, &MainWindow::Work_TextProcess);
+
+
     //开始工作
+    timer1 = startTimer(500);//0.5s定时器
     emit ttstart->tstart();
+}
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    qDebug()<<"timerShot:"<<event->timerId();
+    if(event->timerId()==timer1)
+    {
+        qDebug()<<"0.5s计时器";
+        ui->label_Dlnow->setText(tNowWork());
+    }
+
 }
 void MainWindow::Work_Finished(bool done)
 {
