@@ -165,12 +165,12 @@ QString conver(LONG64 l)
     if(l<1024)
     {
         return QString::number(l,'f',2)+"B/s";
-    }else if(l>1024)
+    }else if(1024<=l && l<(1024*1024))
     {
-        return QString::number(l/1024,'f',2)+"KiB/s";
-    }else if(l>(1024*1024))
+        return QString::number((double)l/(double)1024,'f',2)+"KiB/s";
+    }else if((1024*1024)<=l)
     {
-        return QString::number(l/(1024*1024),'f',2)+"MiB/s";
+        return QString::number((double)l/(double)(1024*1024),'f',2)+"MiB/s";
     }
     return "";
 }
