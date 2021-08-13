@@ -5,7 +5,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QFile>
-#include <QTextCodec>
+
 #include <QCoreApplication>
 #include "Start.h"
 /*遍历目录*/
@@ -47,10 +47,9 @@ void file_search(QString path,QStringList &fileList)
             //qDebug()<<"文件夹:"<<fileInfo.filePath();
             file_search(fileInfo.filePath(),fileList);
         }else{            
-            //文件,添加成员
-            //emit tworkProcess(i,clist.size());
-            //qDebug()<<"文件:"<<fileInfo.filePath().replace("/","\\");
-            fileList<<fileInfo.filePath().replace("/","\\");
+            //文件,添加成员            
+
+            fileList<<fileInfo.filePath();
         }
         //emit tworkProcess(i,clist.size());
         i++;
@@ -59,11 +58,9 @@ void file_search(QString path,QStringList &fileList)
 }
 
 /*获取环境变量temp*/
-string getTempPath(string path)
+QString getTempPath(char* path)
 {
-    QString tem;
-    tem = QProcessEnvironment::systemEnvironment().value(QString::fromStdString(path));
-    return tem.toStdString();
+    return QProcessEnvironment::systemEnvironment().value(QString(path)).replace("\\","/");
 }
 /*创建文件夹*/
 bool createFolderSlot(QString path)
@@ -73,7 +70,7 @@ bool createFolderSlot(QString path)
     if (!dir.exists(path))
     {
     res = dir.mkpath(path);
-    qDebug() << "新建目录是否成功" << res;
+    qDebug() << "新建目录" << res;
     }else{
         qDebug() << "目录已存在" ;
         res = true;
@@ -84,21 +81,21 @@ bool createFolderSlot(QString path)
 void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName)
 {
     QString resFile;
-        resFile=":/"+resProfiex+"/"+resFileName;
-
-        QFile file;
-        file.copy(resFile,destFullPathFileName);
+    resFile=":/"+resProfiex+"/"+resFileName;
+    QFileInfo info(destFullPathFileName);
+    createFolderSlot(info.path());
+    QFile::copy(resFile,destFullPathFileName);
 }
-/*读取文件并返回QBuffer*/
+/*读取文件并返回json字符串*/
 QString readTXT(QString Path)
 {
     qDebug()<<"读取文件"<<Path;
-    QFile file(Path);
+    QFile file(Path.replace("\\","/"));
     QString TXT;
    // qDebug()<<"已被打开"<<file.isOpen();
     if(!file.open(QIODevice::ReadOnly))
         {
-            qDebug()<<"Can't open the file!"<<endl;
+            qDebug()<<"Can't open the file!";
         }
         while(!file.atEnd())
         {
@@ -122,7 +119,7 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
     for(int i=0;i<newsize;i++)
     {
         duplicateFile=false;
-        qDebug()<<i+1<<"//"<<newsize<<"|"<<newFileMD5.at(i);
+        qDebug()<<i+1<<"/"<<newsize<<"|"<<newFileMD5.at(i);
         for(int j=0;j<oldsize;j++)
         {
             if(newFileMD5.at(i)==localFileMD5.at(j))
@@ -140,18 +137,23 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
     /*
     for(int z=0;z<needupdater.size();z++)
     {
-        qDebug()<<"需要更新的文件:"<<z+1<<"//"<<newsize<<"|"<<needupdater.at(z);
+        qDebug()<<"需要更新的文件:"<<z+1<<"/"<<newsize<<"|"<<needupdater.at(z);
     }
     */
     return needupdater;
 }
 bool moveFile(QString oldPath,QString newPath)
 {
+    oldPath.replace("\\","/");
+    newPath.replace("\\","/");
+    qDebug()<<"oldPath:"<<oldPath;
+    qDebug()<<"newPath:"<<newPath;
+    bool re;
     QFile nfile(newPath);
 
     if(!nfile.remove())
     {
-        qDebug()<<"moveFile?.?";
+        qDebug()<<"removeFile X";
     }
     QFile ofile(oldPath);
     if(ofile.isOpen())
@@ -160,13 +162,32 @@ bool moveFile(QString oldPath,QString newPath)
         return(QFile::copy(oldPath,newPath));
 
     }else{
+
         qDebug()<<"尝试移动文件";
-        return(QFile::rename(oldPath,newPath));
+        //re = false;
+        re = QFile::rename(oldPath,newPath);
+        if(!re)
+        {
+            qDebug()<<"?";
+//            re = QFile::rename(
+//                        oldPath.toLocal8Bit().constData(),
+//                        newPath.toLocal8Bit().constData()
+//                        );
+            int reint;
+            reint = rename(
+                        oldPath.replace("/","\\").toLocal8Bit().constData(),
+                        newPath.replace("/","\\").toLocal8Bit().constData()
+                        );
+            qDebug()<<"FILE * E:"<<reint;
+            qDebug()<<GetLastError();
+            if(reint==0)re=true;
+        }
+        return re;
     }
 
 }
 QString dp0()
 {
-    return QCoreApplication::applicationDirPath().replace("/","\\");
+    return QCoreApplication::applicationDirPath();
 }
 

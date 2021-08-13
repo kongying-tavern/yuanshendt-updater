@@ -65,19 +65,14 @@ DISTFILES += \
 TEMPLATE = app
 LIBS+= $$PWD"/curllib/libcurl-x64.dll"
 
-win32: LIBS += -L$$PWD/curllib/ -lcurl
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/curllib/ -lcurl
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/curllib/ -lcurld
 
 INCLUDEPATH += $$PWD/curllib
 DEPENDPATH += $$PWD/curllib
 
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/curllib/curl.lib
-else:win32-g++: PRE_TARGETDEPS += $$PWD/curllib/libcurl.a
-
-
-
-win32:CONFIG(release, debug|release): LIBS += $$PWD/curllib/libcurl.a
-else:win32:CONFIG(debug, debug|release): LIBS += $$PWD/curllib/libcurl.a
-else:unix:!macx: LIBS += $$PWD/curllib/libcurl.a
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/curllib/ -llibcurl.dll
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/curllib/ -llibcurl.dlld
 
 INCLUDEPATH += $$PWD/curllib
 DEPENDPATH += $$PWD/curllib

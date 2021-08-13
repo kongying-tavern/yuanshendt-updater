@@ -6,17 +6,38 @@
 #include <QFileInfo>
 #include <iostream>
 #include <string.h>
-#define CURL_STATICLIB
-#include "curllib\curl.h"
+#include "mainwindow.h"
+#include "Start.h"
 #include "file.h"
 #include <stdio.h>
 #include <Sandefine.h>
 #include <stddef.h>
 #include <QtWidgets/QMessageBox>
+#include <QByteArray>
 using namespace std;
+//初始化
+HTTP::HTTP()
+{
 
+}
+HTTP::~HTTP()
+{
+
+}
+void httpcrt()
+{
+
+    crtPath=getTempPath("temp")+updaterTempDir+"crt/crt.crt";
+    QFileInfo info(crtPath);
+    saveResourecFile("CRT",                             //资源文件前缀
+                     "Resource/crt/curl-ca-bundle.crt", //资源文件路径
+                     crtPath                            //资源文件即将释放到的路径
+                     );//写出资源文件中的crt
+}
+//下载文件
 int httpDownLoad(QString URL,QString Path)
 {
+
     int reint = -10;
     //qDebug()<<"OpeningURL:"<<URL<<Path;
     //return 0;
@@ -27,26 +48,41 @@ int httpDownLoad(QString URL,QString Path)
      * 下载的文件将保存在临时目录/download/
      * 文件名 Path
      */
-    QString tem;
-    //tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\";
-    //createFolderSlot(tem.toStdString());
-    //qDebug()<<tem+Path;
-    QFileInfo info(QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path);
+
+
+    QFileInfo info(getTempPath("temp")+updaterTempDir+"download/"+Path);
     qDebug()<<"即将下载文件:"<<URL;
-    qDebug()<<"准备创建目录:"<<info.path().replace("/","\\");
-    qDebug()<<"即将打开文件:"<<QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path;
+    qDebug()<<"准备创建目录:"<<info.path();
+    qDebug()<<"即将打开文件:"<<getTempPath("temp")+updaterTempDir+"download/"+Path;
     createFolderSlot(info.path());
     //return 0;
 
     //创建文件准备写入
-    //FILE *pagefile= fopen((QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path).toStdString().c_str(), "wb");
+
     FILE *pagefile=NULL;
     int err;
-    err = fopen_s(&pagefile
-                      ,(QString::fromStdString(getTempPath("temp"))+updaterTempDir+"download\\"+Path).toStdString().c_str()
-                      ,"wb"
+    err = fopen_s(&pagefile,
+                  (getTempPath("temp")+updaterTempDir+"download/"+Path).toStdString().c_str()
+                  ,"wb"
+                  );
+
+    if(err!=0)
+    {
+        qDebug()<<"尝试用宽字符编码打开文件";
+        fclose(pagefile);
+        QString tem;
+        tem=getTempPath("temp")+updaterTempDir+"download/"+Path;
+        err = fopen_s(&pagefile,
+                      tem.toLocal8Bit().constData(),
+                      "wb"
                       );
-    qDebug()<<"打开的文件句柄"<<pagefile<<"|"<<err;
+    }
+    qDebug()<<"打开的文件句柄"<<&pagefile<<"|"<<err;
+    if(err!=0)
+    {
+        fclose(pagefile);
+        return err;
+    }
     //Sleep(10000);
 
 
@@ -54,44 +90,36 @@ int httpDownLoad(QString URL,QString Path)
     CURL *handle = curl_easy_init();
 
 
-    //SSL双向认证准备工作
-    QString resProfiex="CRT";//资源文件前缀
-    QString resFile ="Resource/crt/curl-ca-bundle.crt";//资源文件中的文件名称
-    tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"\\crt";
-    createFolderSlot(tem);//创建文件夹保存crt
-    tem = QString::fromStdString(getTempPath("temp"))+updaterTempDir+"\\crt\\crt.crt";
-    QString saveFile=tem;//要保存文件的全路径名称
-    saveResourecFile(resProfiex,resFile,saveFile);//写出资源文件中的crt
-
-
     URL.replace(" ","%20");//A8我被你的带空格文件名坑得好惨啊!!!!!!!!!!X2!
-    curl_easy_setopt(handle, CURLOPT_URL, URL.toStdString().c_str());//指定网址
-    curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);//删除控制台消息
-    //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header头
+    curl_easy_setopt(handle, CURLOPT_URL, URL.toStdString().c_str());//指定网址    
+    //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header
     //curl_easy_setopt(handle, CURLOPT_NOBODY, 1);    //不需要body
     curl_easy_setopt(handle,CURLOPT_FOLLOWLOCATION,1);//设置跟随重定向
     curl_easy_setopt(handle,CURLOPT_MAXCONNECTS,20);//设置最大连接数
-
+    curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);//不下载>400页面
+    curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0L);//获取进度信息
+    curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1L);//openssl编译时使用curl官网或者firefox导出的第三方根证书文件
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 2L);
-    curl_easy_setopt(handle, CURLOPT_CAINFO, tem.toStdString().c_str());/* 证书路径 */
+    curl_easy_setopt(handle, CURLOPT_CAINFO, crtPath.toStdString().c_str());/* 证书路径 */
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);//收到数据反调
-    int curlreint=curl_easy_perform(handle);
-    if (curlreint == CURLE_OK)
+    if(pagefile)
     {
-        if (pagefile)
+        curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
+        int curlreint=curl_easy_perform(handle);
+        reint = fclose(pagefile);
+        qDebug()<<"fclose reint "<<reint;
+        if(curlreint == CURLE_OK)
         {
-            curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
-            curl_easy_perform(handle);//
-            reint = fclose(pagefile);            
-            if(reint!=0)QMessageBox::warning(NULL,"写出文件","错误:"+QString::number(reint));
+            return curlreint;
         }else{
-            reint = -2;
+            QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curlreint));
+            reint = -3;
         }
-        reint = 0;
-    } else {        
-        QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curlreint));
-        reint = -3;
+        if(reint!=0){
+            qDebug()<<"closeflie?.?"<<reint;
+        }
+
     }
 
     curl_easy_cleanup(handle);
@@ -111,4 +139,26 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
     //return retSize;
     return nmemb;
 
+}
+int progress_callback(void *clientp,//用户自定义参数,通过设置CURLOPT_XFERINFODATA属性来传递
+                      curl_off_t dltotal,//需要下载的字节数
+                      curl_off_t dlnow,//已经下载的字节数
+                      curl_off_t ultotal,//将要上传的字节数
+                      curl_off_t ulnow//已经上传的字节数
+                      )//返回非0将会中断传输，错误代码是 CURLE_ABORTED_BY_CALLBACK
+{
+    QString tem;
+    tem=
+            QString::number(dlnow)+
+            "|"+
+            QString::number(dltotal)
+            ;
+    Start::dlworking(tem);
+
+    //Start &mutualStart = Start::getInstance();
+    //Start *nowStart=(Start*)(Start::mutualStart);
+    //nowStart->tworkDlnow(tem);
+    //mutualStart.tworkDlnow(tem);
+
+    return 0;
 }

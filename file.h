@@ -14,12 +14,30 @@ class file
 
 };
 
-void file_search(QString path,QStringList &fileList);
-string getTempPath(string path);
+void file_search(QString path,
+                 QStringList &fileList
+                 );
+
+QString getTempPath(char* path);
+
 bool createFolderSlot(QString path);
-void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName);
+
+void saveResourecFile(QString resProfiex,
+                      QString resFileName,
+                      QString destFullPathFileName
+                      );
+
 QString readTXT(QString Path);
-QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStringList newFilePath,QStringList newFileMD5);
-bool moveFile(QString oldPath,QString newPath);
+
+QStringList getUptater(QStringList localFilePath,
+                       QStringList localFileMD5,
+                       QStringList newFilePath,
+                       QStringList newFileMD5
+                       );
+
+bool moveFile(QString oldPath,
+              QString newPath
+              );
+
 QString dp0();
 #endif // FILE_H

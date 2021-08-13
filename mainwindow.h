@@ -9,7 +9,7 @@
 #include <QPainter>
 #include <QGraphicsDropShadowEffect>
 #include <QtConcurrent>
-#include <start.h>
+#include <Start.h>
 QT_BEGIN_NAMESPACE
 #include <iostream>
 using namespace std;
@@ -48,6 +48,7 @@ private slots:
 
 
 
+
 public:
     static MainWindow *mutualUi;
     /*窗口控制托管sub*/
@@ -55,7 +56,7 @@ public:
     void changeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
     void changeProgressBarValue(int a,int b);/*修改进度条进度*/
     void changeProgressBarColor(QString rgba,QString rgbb);
-
+    void Work_Dlnow(QString txt);
     /*多线程*/
 
     void threadWork(QString path);
@@ -68,11 +69,13 @@ private:
         QPoint clickPos;
         Start *ttstart=nullptr;
     Ui::MainWindow *ui;
-
+    /*timerEvent*/
+    void timerEvent(QTimerEvent *event);
+    int timer1;
     /*多线程传参*/
 
 };
 
 bool exeIsRunning();
-static void threadChangeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
+//static void threadChangeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
 #endif // MAINWINDOW_H
