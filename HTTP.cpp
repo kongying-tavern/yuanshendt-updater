@@ -148,12 +148,9 @@ int progress_callback(void *clientp,//用户自定义参数,通过设置CURLOPT_
                       )//返回非0将会中断传输，错误代码是 CURLE_ABORTED_BY_CALLBACK
 {
     QString tem;
-    tem=
-            QString::number(dlnow)+
-            "|"+
-            QString::number(dltotal)
-            ;
-    Start::dlworking(tem);
+
+
+    Start::dlworking(dlnow,dltotal);
 
     //Start &mutualStart = Start::getInstance();
     //Start *nowStart=(Start*)(Start::mutualStart);
@@ -161,4 +158,19 @@ int progress_callback(void *clientp,//用户自定义参数,通过设置CURLOPT_
     //mutualStart.tworkDlnow(tem);
 
     return 0;
+}
+QString conver(LONG64 l)
+{
+
+    if(l<1024)
+    {
+        return QString::number(l,'f',2)+"B/s";
+    }else if(l>1024)
+    {
+        return QString::number(l/1024,'f',2)+"KiB/s";
+    }else if(l>(1024*1024))
+    {
+        return QString::number(l/(1024*1024),'f',2)+"MiB/s";
+    }
+    return "";
 }

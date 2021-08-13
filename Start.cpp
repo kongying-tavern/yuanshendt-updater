@@ -30,18 +30,34 @@ Start::~Start()
 }
 
 
-void Start::dlworking(QString txt)
+void Start::dlworking(LONG64 dlnow,LONG64 dltotal)
 {
-    //qDebug()<<txt;
-    threadWorking = txt;
+    //qDebug()<<"dlnow/dltotal"<<a1<<b;
+    a1=dlnow;
+    b=dltotal;
+    //threadWorking = txt;
 }
 QString tNowWork()
 {
-    return threadWorking;
+    qDebug()<<a1<<a2<<b;
+    if(b==0)
+    {
+        return "";
+    }
+    qDebug()<<"计算网速";
+    int p = (int)(100*((double)a1/(double)b));
+    qDebug()<<p;
+    QString tem = conver((a1-a2)*2);
+    a2=a1;
+
+    return QString::number(p)+"%|"+tem;
 }
 
 void Start::work()
 {
+    a1=0;
+    a2=0;
+    b=0;
 
     //mutualStart = this;
     QString path=this->dir;
@@ -171,7 +187,9 @@ void Start::work()
         qDebug()<<"downloadpath:"<<dlpath;
 
         //QMessageBox::information(NULL,QString::number(i),dlpath);
-
+        a1=0;
+        a2=0;
+        b=0;
         MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
         emit tworkProcess(i,needUpdate.size());
 

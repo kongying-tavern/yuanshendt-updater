@@ -13,6 +13,9 @@
 #include "HTTP.h"
 using namespace std;
 static QString threadWorking;
+static LONG64 a1;
+static LONG64 a2;
+static LONG64 b;
 class Start : public QObject
 {
     Q_OBJECT
@@ -22,7 +25,7 @@ public:
     Start(QString dir, QObject *parent);
     ~Start();
     static void stsworkProcess(int a,int b);
-    static void dlworking(QString txt);
+    static void dlworking(LONG64 dlnow,LONG64 dltotal);
 public:
 
 private:

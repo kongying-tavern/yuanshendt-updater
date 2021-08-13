@@ -221,13 +221,17 @@ void MainWindow::timerEvent(QTimerEvent *event)
     if(event->timerId()==timer1)
     {
         qDebug()<<"0.5s计时器";
-        ui->label_Dlnow->setText(tNowWork());
+        QString tem =tNowWork();
+        qDebug()<<tem;
+        if(tem!="")ui->label_Dlnow->setText(tem);
+
     }
 
 }
 void MainWindow::Work_Finished(bool done)
 {
     alldone=done;
+    killTimer(timer1);
 }
 
 

@@ -26,7 +26,7 @@ int progress_callback(void *clientp,
                       curl_off_t dlnow, curl_off_t ultotal,
                       curl_off_t ulnow
                       );
-
+QString conver(LONG64 l);
 
 
 
