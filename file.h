@@ -32,7 +32,8 @@ QString readTXT(QString Path);
 QStringList getUptater(QStringList localFilePath,
                        QStringList localFileMD5,
                        QStringList newFilePath,
-                       QStringList newFileMD5
+                       QStringList newFileMD5,
+                       QString lworkPath
                        );
 
 bool moveFile(QString oldPath,

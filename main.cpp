@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
         //qDebug()<<tem;
     }
     qDebug()<<"传参路径："<<tem;
-
     QApplication a(argc, argv);
 
     MainWindow w(NULL,tem);

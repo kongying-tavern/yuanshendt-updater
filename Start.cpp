@@ -39,14 +39,14 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal)
 }
 QString tNowWork()
 {
-    qDebug()<<a1<<a2<<b;
+    //qDebug()<<a1<<a2<<b;
     if(b==0)
     {
         return "";
     }
-    qDebug()<<"计算网速";
+    //qDebug()<<"计算网速";
     int p = (int)(100*((double)a1/(double)b));
-    qDebug()<<p;
+    //qDebug()<<p;
     QString tem = conver((a1-a2)*2);
     a2=a1;
 
@@ -61,6 +61,7 @@ void Start::work()
 
     //mutualStart = this;
     QString path=this->dir;
+
     //return;
     MainWindow::mutualUi->changeMainPage(0);
     qDebug()<<"工作目标："<<path;
@@ -155,7 +156,12 @@ void Start::work()
                 QString("rgb(58, 59, 64)")
                 ,QString("#3880cc"));
     QStringList needUpdate;
-    needUpdate = getUptater(localFileList,localFileListMD5,newFileList,newFileMD5);
+    needUpdate = getUptater(localFileList,
+                            localFileListMD5,
+                            newFileList,
+                            newFileMD5,
+                            path
+                            );
     if(needUpdate.size()==0)
     {
         //此时文件均为最新
@@ -165,7 +171,7 @@ void Start::work()
         emit tworkFinished(true);
         return;
     }
-
+    //return;
     /*下载需要更新的文件**********************************************/
     /* 下载文件
      * 需要更新的文件在 QStringList needUpdater
@@ -243,8 +249,10 @@ void Start::work()
         QFileInfo info(newPath);
         createFolderSlot(info.path());
 
-        if(!moveFile(oldPath,newPath))
+        if(moveFile(oldPath,newPath))
         {
+            qDebug()<<"√（＾－＾）";
+        }else{
             qDebug()<<"移动失败";
             //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
         }

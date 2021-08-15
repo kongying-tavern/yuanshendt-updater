@@ -147,7 +147,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
     if(alldone)
     {
 
-        qDebug()<<QString(workPath+"/Map.exe");
+        qDebug()<<QString("start "+workPath+"/Map.exe");
         QProcess process(this);
         process.setProgram("cmd");
         QStringList argument;
@@ -217,12 +217,12 @@ void MainWindow::startThread(QString path)
 }
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    qDebug()<<"timerShot:"<<event->timerId();
+    //qDebug()<<"timerShot:"<<event->timerId();
     if(event->timerId()==timer1)
     {
-        qDebug()<<"0.5s计时器";
+        //qDebug()<<"0.5s计时器";
         QString tem =tNowWork();
-        qDebug()<<tem;
+       // qDebug()<<tem;
         if(tem!="")ui->label_Dlnow->setText(tem);
 
     }

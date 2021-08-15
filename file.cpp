@@ -8,6 +8,7 @@
 
 #include <QCoreApplication>
 #include "Start.h"
+#include "Sandefine.h"
 /*遍历目录*/
 void file_search(QString path,QStringList &fileList)
 {
@@ -109,7 +110,7 @@ QString readTXT(QString Path)
     return TXT;
 }
 /*对比获取需要更新的文件*/
-QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStringList newFilePath,QStringList newFileMD5)
+QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStringList newFilePath,QStringList newFileMD5,QString lworkPath="")
 {
     QStringList needupdater;
     int oldsize = localFileMD5.size();
@@ -119,11 +120,18 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
     for(int i=0;i<newsize;i++)
     {
         duplicateFile=false;
-        qDebug()<<i+1<<"/"<<newsize<<"|"<<newFileMD5.at(i);
+        qDebug()<<i+1<<"/"<<newsize<<"|"<<newFileMD5.at(i)<<newFilePath.at(i);
         for(int j=0;j<oldsize;j++)
         {
-            if(newFileMD5.at(i)==localFileMD5.at(j))
+
+            if(newFileMD5.at(i)==localFileMD5.at(j)
+                    &&
+                    newFilePath.at(i)==QString(localFilePath.at(j)).replace(lworkPath+"/","")
+                    )
             {
+//                qDebug()<<newFilePath.at(i);
+//                qDebug()<<lworkPath;
+//                qDebug()<<QString(localFilePath.at(j)).replace(lworkPath+"/","");
                 duplicateFile=true;
                 break;
             }
@@ -134,12 +142,12 @@ QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStrin
         }        
 
     }
-    /*
+
     for(int z=0;z<needupdater.size();z++)
     {
         qDebug()<<"需要更新的文件:"<<z+1<<"/"<<newsize<<"|"<<needupdater.at(z);
     }
-    */
+
     return needupdater;
 }
 bool moveFile(QString oldPath,QString newPath)
