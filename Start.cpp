@@ -92,7 +92,7 @@ void Start::work()
     QStringList localFileList;//创建字符串数组
     /*读取本地文件MD5**************************************************/
 
-    //qDebug()<<"遍历目录:"<<path;
+    qDebug()<<"遍历目录:"<<path;
     //return;
     file_search(path,localFileList);
     //return;

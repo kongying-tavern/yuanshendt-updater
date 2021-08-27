@@ -137,7 +137,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
     //cout<<size*nmemb<<"bytes"<<" received!"<<endl;
     fflush(pFile);
     //return retSize;
-    return nmemb;
+    return retSize;
 
 }
 int progress_callback(void *clientp,//用户自定义参数,通过设置CURLOPT_XFERINFODATA属性来传递

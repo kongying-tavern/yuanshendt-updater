@@ -149,10 +149,19 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
 
         qDebug()<<QString("start "+workPath+"/Map.exe");
         QProcess process(this);
-        process.setProgram("cmd");
         QStringList argument;
-        argument << "/c" <<"start"<<""""<<workPath+"/Map.exe";
+        /*
+        process.setProgram("cmd");        
+        argument <<"/c"
+                 <<"start"
+                 <<""""
+                 <<workPath+"/Map.exe"
+                   ;
+        */
+        QString e=workPath+"/Map.exe";
+        process.setProgram(e);
         process.setArguments(argument);
+        argument <<"/c";
         if(process.startDetached())
         {
             QApplication* app;
@@ -175,7 +184,6 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
                     "./",
                     QFileDialog::ShowDirsOnly
                 );
-        //dir.replace("/","\\");
         tem =dir.toStdString();
         qDebug()<<dir;
         if(string(tem)==""){

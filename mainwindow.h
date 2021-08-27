@@ -43,12 +43,6 @@ private slots:
     void Work_Process(int a,int b);
     void Work_Finished(bool done);
 
-
-
-
-
-
-
 public:
     static MainWindow *mutualUi;
     /*窗口控制托管sub*/
@@ -58,7 +52,6 @@ public:
     void changeProgressBarColor(QString rgba,QString rgbb);
     void Work_Dlnow(QString txt);
     /*多线程*/
-
     void threadWork(QString path);
     void startThread(QString path);
 

@@ -28,6 +28,7 @@ SOURCES += \
     MD5.cpp \
     Start.cpp \
     file.cpp \
+    log.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -38,6 +39,7 @@ HEADERS += \
     Sandefine.h \
     Start.h \
     file.h \
+    log.h \
     mainwindow.h
 
 FORMS += \
@@ -65,14 +67,10 @@ DISTFILES += \
 TEMPLATE = app
 LIBS+= $$PWD"/curllib/libcurl-x64.dll"
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/curllib/ -lcurl
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/curllib/ -lcurld
-
+win32: LIBS += -L$$PWD/curllib/ -lcurl
 INCLUDEPATH += $$PWD/curllib
 DEPENDPATH += $$PWD/curllib
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/curllib/ -llibcurl.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/curllib/ -llibcurl.dlld
-
+win32: LIBS += -L$$PWD/curllib/ -llibcurl.dll
 INCLUDEPATH += $$PWD/curllib
 DEPENDPATH += $$PWD/curllib
