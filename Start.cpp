@@ -87,35 +87,8 @@ void Start::work()
     createFolderSlot(tempPath);
     /*在临时目录释放crt证书*/
     httpcrt();
-    /*遍历目录*/
 
-    QStringList localFileList;//创建字符串数组
-    /*读取本地文件MD5**************************************************/
 
-    qDebug()<<"遍历目录:"<<path;
-    //return;
-    file_search(path,localFileList);
-    //return;
-    emit tworkProcess(0,1);
-    /*获取本地文件MD5*/
-    QStringList localFileListMD5;
-    MainWindow::mutualUi->changeProgressBarColor(
-                QString("rgb(235, 235, 235)")
-                ,QString("rgb(58, 59, 64)"));
-    for(int i = 0; i< localFileList.size();++i)
-    {
-
-        MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+localFileList.at(i));
-        emit tworkProcess(i,localFileList.size());
-
-        //qDebug()<<localFileList.at(i);
-        localFileListMD5<<getFlieMD5(localFileList.at(i));
-    }
-
-    /*
-      旧文件列表     localFileList
-      旧文件列表-MD5 localFileListMD5
-    */
     /*获取在线md5******************************************************/
     /* 获取在线文件md5
      * url  download.yuanshen.site/md5.json
@@ -127,7 +100,10 @@ void Start::work()
     httpDownLoad(dlurl"md5.json","md5.json");
 
     /*读取在线文件md5.json到
-      * QJson newmd5.json
+      * QJson  newmd5.json
+      * 字符串  QString newMD5Str
+      * 文件数  QSL newFileList
+      * 文件MD5 QSL newFileMD5
       */
     //_sleep(1000);
     QString newMD5Str;
@@ -139,39 +115,26 @@ void Start::work()
     jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
 
 //    return;
-    /*文件对比********************************************************/
-    /*
-      * 获取需要更新的文件
-      * 旧文件列表     QStringList localFileList
-      * 新文件列表     QStringList newFlieList
-      * 旧文件列表-MD5 QStringList localFileListMD5
-      * 新文件列表-MD5 QStringList newFileMD5
-      */
+    /*按需读取本地文件MD5**************************************************/
+    emit tworkProcess(0,1);//进度条归零
 
-    MainWindow::mutualUi->changeMainPage0label_Text("对比需要更新的文件");
-    emit tworkProcess(0,1);
-    Sleep(300);
-    emit tworkProcess(1,1);
-    MainWindow::mutualUi->changeProgressBarColor(
-                QString("rgb(58, 59, 64)")
-                ,QString("#3880cc"));
     QStringList needUpdate;
-    needUpdate = getUptater(localFileList,
-                            localFileListMD5,
-                            newFileList,
-                            newFileMD5,
-                            path
-                            );
-    if(needUpdate.size()==0)
+
+    qDebug()<<"按需读取本地文件MD5:"<<path;
+
+    for(int i = 0; i< newFileList.size();++i)
     {
-        //此时文件均为最新
-        qDebug()<<"无需更新";
-        MainWindow::mutualUi->changeMainPage0label_Text("无需更新");
-        MainWindow::mutualUi->changeMainPage(1,true);
-        emit tworkFinished(true);
-        return;
+        //qDebug()<<newFileMD5.at(i)<<this->dir+"/"+newFileList.at(i);
+        emit tworkProcess(i,newFileList.size());
+        if(newFileMD5.at(i) != getFlieMD5(this->dir+"/"+newFileList.at(i)))
+        {
+            MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
+            qDebug()<<"MD5不匹配:"<<dir+"/"+newFileList.at(i);
+            needUpdate<<newFileList.at(i);
+        }
     }
     //return;
+
     /*下载需要更新的文件**********************************************/
     /* 下载文件
      * 需要更新的文件在 QStringList needUpdater

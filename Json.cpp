@@ -22,11 +22,8 @@ void jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
 
    jay = jdc.array();
    qDebug()<<"jaysize:"<<jay.size();
-   for(int i=0;i<jay.size();i++) {
-       //qDebug()<<jay.at(i);
-       //qDebug()<<"filePath"<<jay.at(i).toObject()["filePath"].toString();
-       filePath<<jay.at(i).toObject()["filePath"].toString();
-       //qDebug()<<"MD5"<<jay.at(i).toObject()["MD5"].toString();
+   for(int i=0;i<jay.size();i++) {       
+       filePath<<jay.at(i).toObject()["filePath"].toString();       
        fileMD5<<jay.at(i).toObject()["MD5"].toString();
    }
 }
