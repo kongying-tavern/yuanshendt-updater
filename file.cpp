@@ -166,8 +166,8 @@ bool moveFile(QString oldPath,QString newPath)
     QFile ofile(oldPath);
     if(ofile.isOpen())
     {
-        qDebug()<<"文件占用?.?尝试复制文件";
-        return(QFile::copy(oldPath,newPath));
+        qDebug()<<"文件占用?.?";
+        return(-1);
 
     }else{
 

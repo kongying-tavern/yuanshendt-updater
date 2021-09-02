@@ -179,7 +179,7 @@ void Start::work()
     MainWindow::mutualUi->changeProgressBarColor(
                 QString("#00c500")
                 ,QString("#078bff"));
-
+    int f=0;
     for(int i = 0; i< needUpdate.size();++i)
     {
 
@@ -215,14 +215,27 @@ void Start::work()
         if(moveFile(oldPath,newPath))
         {
             qDebug()<<"√（＾－＾）";
+            f=0;
         }else{
-            qDebug()<<"移动失败";
+            qDebug()<<"移动失败第"<<f<<"次";
+            f++;
+            i--;
+            if(f>3)
+            {
+                Sleep(1000);
+                emit tworkProcess(0,1);
+                MainWindow::mutualUi->changePBText("自动更新失败,请单击重试");
+                emit tworkFinished(false);
+                MainWindow::mutualUi->changeMainPage(1,false);
+                return;
+            }
+
             //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
         }
         emit tworkProcess(i,needUpdate.size());
     }
     emit tworkProcess(1,1);
-    MainWindow::mutualUi->changeMainPage0label_Text("所有工作结束,可关闭下载器");
+    MainWindow::mutualUi->changeMainPage0label_Text("不存在的看不到这句话的");
 
     MainWindow::mutualUi->changeMainPage(1,true);
 

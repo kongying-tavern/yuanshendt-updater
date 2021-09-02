@@ -53,7 +53,10 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
+void MainWindow::changePBText(QString str)
+{
+    ui->pushButton_Start->setText(str);
+}
 void MainWindow::changeMainPage(int mod,bool done)/*托管修改MainPage*/
 {
     //cout<<mod<<endl;

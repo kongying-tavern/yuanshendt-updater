@@ -50,6 +50,7 @@ public:
     void changeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
     void changeProgressBarValue(int a,int b);/*修改进度条进度*/
     void changeProgressBarColor(QString rgba,QString rgbb);
+    void changePBText(QString str);//修改按钮文本
     void Work_Dlnow(QString txt);
     /*多线程*/
     void threadWork(QString path);
