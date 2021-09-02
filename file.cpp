@@ -162,13 +162,7 @@ bool moveFile(QString oldPath,QString newPath)
     if(!nfile.remove())
     {
         qDebug()<<"removeFile X";
-    }
-    QFile ofile(oldPath);
-    if(ofile.isOpen())
-    {
-        qDebug()<<"文件占用?.?";
-        return(-1);
-
+        return false;
     }else{
 
         qDebug()<<"尝试移动文件";
