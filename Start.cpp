@@ -161,7 +161,6 @@ void Start::work()
         b=0;
         MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
         emit tworkProcess(i,needUpdate.size());
-        qDebug()<<tempPath+"Map/download/"+newFileList.at(i);
         if(needUpdateMD5.at(i)!=getFlieMD5(tempPath+"download/Map/"+needUpdate.at(i)))
         {
             qDebug()<<"全新下载";
