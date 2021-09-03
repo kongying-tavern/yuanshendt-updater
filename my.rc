@@ -1,0 +1,43 @@
+IDI_ICON1  ICON  "Resource\\MainIcon.ico"
+1 24 uac.manifest
+
+#if defined(UNDER_CE)
+#include <winbase.h>
+#else
+#include <winver.h>
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION 1,0,3
+    PRODUCTVERSION 1,0,0,10
+    FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+    FILEFLAGS VS_FF_DEBUG
+#else
+    FILEFLAGS 0x0L
+#endif
+    FILEOS VOS__WINDOWS32
+    FILETYPE VFT_DLL
+    FILESUBTYPE 0x0L
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "080404b0"
+            BEGIN
+                VALUE "CompanyName", "\0"
+                VALUE "FileDescription", "空荧地图更新器\0"
+                VALUE "FileVersion", "1.1,2\0"
+                VALUE "ProductVersion", "1.1.2\0"
+                VALUE "LegalCopyright", "\0"
+                VALUE "LegalTrademarks", "\0"
+                VALUE "OriginalFilename", "KYUpdater_v1.1.2_release.exe\0"
+                VALUE "ProductName", "YuanshendtUpdater\0\0"
+                VALUE "InternalName", "1.1.2.exe\0"
+           END
+        END
+
+        BLOCK "VarFileInfo"
+        BEGIN
+            VALUE "Translation", 0x804, 1200
+        END
+    END

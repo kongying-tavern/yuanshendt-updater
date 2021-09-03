@@ -163,27 +163,35 @@ bool moveFile(QString oldPath,QString newPath)
     {
         qDebug()<<"removeFile X";
     }
-    qDebug()<<"尝试移动文件";
-    //re = false;
-    re = QFile::rename(oldPath,newPath);
-    if(!re)
+    QFile ofile(oldPath);
+    if(ofile.isOpen())
     {
-        qDebug()<<"?";
-        //            re = QFile::rename(
-        //                        oldPath.toLocal8Bit().constData(),
-        //                        newPath.toLocal8Bit().constData()
-        //                        );
-        int reint;
-        reint = rename(
-                    oldPath.replace("/","\\").toLocal8Bit().constData(),
-                    newPath.replace("/","\\").toLocal8Bit().constData()
-                    );
-        qDebug()<<"FILE * E:"<<reint;
-        qDebug()<<GetLastError();
-        if(reint==0)re=true;
-    }
-    return re;
+        qDebug()<<"文件占用?.?";
+        return(-1);
 
+    }else{
+
+        qDebug()<<"尝试移动文件";
+        //re = false;
+        re = QFile::rename(oldPath,newPath);
+        if(!re)
+        {
+            qDebug()<<"?";
+//            re = QFile::rename(
+//                        oldPath.toLocal8Bit().constData(),
+//                        newPath.toLocal8Bit().constData()
+//                        );
+            int reint;
+            reint = rename(
+                        oldPath.replace("/","\\").toLocal8Bit().constData(),
+                        newPath.replace("/","\\").toLocal8Bit().constData()
+                        );
+            qDebug()<<"FILE * E:"<<reint;
+            qDebug()<<GetLastError();
+            if(reint==0)re=true;
+        }
+        return re;
+    }
 
 }
 QString dp0()

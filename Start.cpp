@@ -119,7 +119,7 @@ void Start::work()
     emit tworkProcess(0,1);//进度条归零
 
     QStringList needUpdate;
-    QStringList needUpdateMD5;
+
     qDebug()<<"按需读取本地文件MD5:"<<path;
 
     for(int i = 0; i< newFileList.size();++i)
@@ -131,7 +131,6 @@ void Start::work()
             MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
             qDebug()<<"MD5不匹配:"<<dir+"/"+newFileList.at(i);
             needUpdate<<newFileList.at(i);
-            needUpdateMD5<<newFileMD5.at(i);
         }
     }
     //return;
@@ -139,7 +138,8 @@ void Start::work()
     /*下载需要更新的文件**********************************************/
     /* 下载文件
      * 需要更新的文件在 QStringList needUpdater
-     *
+     * 下载文件前需要对字符串做很多工作
+     * 一是反斜杠转斜杠并删除第一个斜杠
      */
      QString tem;
      MainWindow::mutualUi->changeProgressBarColor(
@@ -161,14 +161,8 @@ void Start::work()
         b=0;
         MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
         emit tworkProcess(i,needUpdate.size());
-        if(needUpdateMD5.at(i)!=getFlieMD5(tempPath+"download/Map/"+needUpdate.at(i)))
-        {
-            qDebug()<<"全新下载";
-            httpDownLoad(url,dlpath);
-        }else{
-            qDebug()<<"该文件已下载";
-        }
 
+        httpDownLoad(url,dlpath);
 
         //Sleep(100);
 
@@ -234,6 +228,7 @@ void Start::work()
                 emit tworkFinished(false);
                 MainWindow::mutualUi->changeMainPage(1,false);
                 return;
+
             }
 
             //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");

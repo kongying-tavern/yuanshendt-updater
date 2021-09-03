@@ -2,10 +2,15 @@ QT       += core gui
 QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #编译图标#管理员
-RC_FILE += myico.rc
+RC_FILE += my.rc
 CONFIG += c++11
 #debug窗口
 #CONFIG +=console
+
+#版本信息
+VERSION = 1.1.2
+
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
