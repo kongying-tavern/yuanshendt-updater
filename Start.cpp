@@ -1,4 +1,4 @@
-#include "Start.h"
+﻿#include "Start.h"
 #include <QStringList>
 #include <QtWidgets/QMessageBox>
 #include <QCoreApplication>
@@ -21,7 +21,9 @@ Start::Start(QString dir, QObject *parent)
     moveToThread(workProcess);
     workProcess->start();
     this->dir = dir;
+    http = new HTTP(NULL);
     connect(this, &Start::tstart, this, &Start::work);
+    connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
 }
 
 Start::~Start()
@@ -32,10 +34,8 @@ Start::~Start()
 
 void Start::dlworking(LONG64 dlnow,LONG64 dltotal)
 {
-    //qDebug()<<"dlnow/dltotal"<<a1<<b;
     a1=dlnow;
     b=dltotal;
-    //threadWorking = txt;
 }
 QString tNowWork()
 {
@@ -49,16 +49,25 @@ QString tNowWork()
     //qDebug()<<p;
     QString tem = conver((a1-a2)*2);
     a2=a1;
-
     return QString::number(p)+"%|"+tem;
+}
+void Start::updaterErr()
+{
+    emit tworkProcess(0,1);
+    MainWindow::mutualUi->changePBText("自动更新失败,请单击重试");
+    emit tworkFinished(false);
+    MainWindow::mutualUi->changeMainPage(1,false);
+    emit tworkMessageBox(1,
+                         "自动更新失败",
+                         uperr);
 }
 
 void Start::work()
 {
+
     a1=0;
     a2=0;
     b=0;
-
     //mutualStart = this;
     QString path=this->dir;
 
@@ -68,7 +77,25 @@ void Start::work()
     //return;
     //return;
     /*前期工作********************************************************/
-    /*获取系统环境变量temp*/
+    /*互斥原神本体路径*/
+    QFileInfo yuanshen(path+"/YuanShen.exe");
+    if(yuanshen.exists())
+    {
+        qDebug()<<"目标目录找到原神本体";
+        MainWindow::mutualUi->changeProgressBarColor(
+                    QString("rgb(255, 0, 0)")
+                    ,QString("rgb(255, 0, 0)"));
+        MainWindow::mutualUi->changeMainPage0label_Text("?");
+        emit tworkMessageBox(
+                    1,
+                    "我受过专业的训练",
+                    "但是请你不要把地图装在原神目录"
+                    );
+        MainWindow::mutualUi->changeMainPage(1,false);
+        emit tworkFinished(false);
+        return;
+    }
+    /*获取系统环境变量temp*********************************************/
     MainWindow::mutualUi->changeMainPage0label_Text("初始化...");
     emit tworkProcess(1,2);
     MainWindow::mutualUi->changeProgressBarColor(
@@ -77,10 +104,7 @@ void Start::work()
     QString tempPath;
     tempPath=getTempPath("temp");
     qDebug()<<"临时目录:"<<tempPath;
-    /*
-    cout<<url<<endl;
-    cout<<urlMap<<endl;
-    */
+
     /*在%temp%创建临时目录*/
     tempPath=tempPath+updaterTempDir;
     qDebug()<<"临时文件夹:"<<tempPath;
@@ -97,7 +121,7 @@ void Start::work()
      */
 
     MainWindow::mutualUi->changeMainPage0label_Text("获取在线文件MD5...");
-    httpDownLoad(dlurl"md5.json","md5.json");
+    http->httpDownLoad(dlurl"md5.json","md5.json");
 
     /*读取在线文件md5.json到
       * QJson  newmd5.json
@@ -145,6 +169,7 @@ void Start::work()
      MainWindow::mutualUi->changeProgressBarColor(
                  QString("#3880cc")
                  ,QString("#00c500"));
+     int retry=0;
     for(int i = 0; i< needUpdate.size();++i)
     {
 
@@ -162,8 +187,16 @@ void Start::work()
         MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
         emit tworkProcess(i,needUpdate.size());
 
-        httpDownLoad(url,dlpath);
-
+        if(http->httpDownLoad(url,dlpath)==0)
+        {
+            retry=0;
+        }else{
+            retry++;
+        }
+        if(retry>1){
+            Start::updaterErr();
+            return;
+        }
         //Sleep(100);
 
     }
@@ -222,13 +255,8 @@ void Start::work()
             i--;
             if(f>3)
             {
-                Sleep(1000);
-                emit tworkProcess(0,1);
-                MainWindow::mutualUi->changePBText("自动更新失败,请单击重试");
-                emit tworkFinished(false);
-                MainWindow::mutualUi->changeMainPage(1,false);
+                Start::updaterErr();
                 return;
-
             }
 
             //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
@@ -237,9 +265,7 @@ void Start::work()
     }
     emit tworkProcess(1,1);
     MainWindow::mutualUi->changeMainPage0label_Text("不存在的看不到这句话的");
-
     MainWindow::mutualUi->changeMainPage(1,true);
-
     emit tworkFinished(true);
 }
 

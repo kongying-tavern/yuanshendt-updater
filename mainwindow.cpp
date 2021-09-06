@@ -1,7 +1,7 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
-#include <QtWidgets/QMessageBox>
+
 #include "qstring.h"
 #include <shlwapi.h>
 #include "Sandefine.h"
@@ -220,7 +220,7 @@ void MainWindow::startThread(QString path)
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
     connect(ttstart, &Start::tworkProcess, this, &MainWindow::Work_Process);
     connect(ttstart, &Start::tworkFinished, this, &MainWindow::Work_Finished);
-
+    connect(ttstart, &Start::tworkMessageBox, this, &MainWindow::Work_MessageBox);
 
     //开始工作
     timer1 = startTimer(500);//0.5s定时器
@@ -235,14 +235,35 @@ void MainWindow::timerEvent(QTimerEvent *event)
         QString tem =tNowWork();
        // qDebug()<<tem;
         if(tem!="")ui->label_Dlnow->setText(tem);
-
     }
-
 }
 void MainWindow::Work_Finished(bool done)
 {
     alldone=done;
     killTimer(timer1);
+}
+void MainWindow::Work_MessageBox(int tag,QString title,QString txt)
+{
+    QMessageBox *box=new QMessageBox(this);
+    switch (tag) {
+        case 0:
+            //信息
+            box->setIcon(QMessageBox::Information);
+            break;
+        case 1:
+            //错误
+            box->setIcon(QMessageBox::Warning);
+            break;
+        default:
+            printf("----------?--------\n");
+    }
+    box->setWindowTitle(title);
+    box->setText(txt);
+    box->setStandardButtons(QMessageBox::Ok);
+    box->setAttribute(Qt::WA_DeleteOnClose);
+    box->setModal(false);//非模态
+    box->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    box->show();
 }
 
 

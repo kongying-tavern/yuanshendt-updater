@@ -4,13 +4,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #编译图标#管理员
 RC_FILE += my.rc
 CONFIG += c++11
-#debug窗口
+#日志窗口
 #CONFIG +=console
-
-#版本信息
-VERSION = 1.1.2
-
-
+#日志输出
+DEFINES += QT_MESSAGELOGCONTEXT
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -33,7 +30,6 @@ SOURCES += \
     MD5.cpp \
     Start.cpp \
     file.cpp \
-    log.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -44,7 +40,6 @@ HEADERS += \
     Sandefine.h \
     Start.h \
     file.h \
-    log.h \
     mainwindow.h
 
 FORMS += \

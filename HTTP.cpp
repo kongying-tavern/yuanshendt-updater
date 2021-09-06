@@ -1,4 +1,4 @@
-#include "HTTP.h"
+﻿#include "HTTP.h"
 #include <QFile>
 #include <QBuffer>
 #include <QDebug>
@@ -16,7 +16,8 @@
 #include <QByteArray>
 using namespace std;
 //初始化
-HTTP::HTTP()
+HTTP::HTTP(QObject *parent)
+    : QObject(parent)
 {
 
 }
@@ -35,7 +36,7 @@ void httpcrt()
                      );//写出资源文件中的crt
 }
 //下载文件
-int httpDownLoad(QString URL,QString Path)
+int HTTP::httpDownLoad(QString URL,QString Path)
 {
 
     int reint = -10;
@@ -62,7 +63,11 @@ int httpDownLoad(QString URL,QString Path)
     FILE *pagefile=NULL;
     int err;
     err = fopen_s(&pagefile,
-                  (getTempPath("temp")+updaterTempDir+"download/"+Path).toStdString().c_str()
+                  (
+                      getTempPath("temp")
+                      +updaterTempDir+"download/"
+                      +Path
+                  ).toStdString().c_str()
                   ,"wb"
                   );
 
@@ -88,9 +93,6 @@ int httpDownLoad(QString URL,QString Path)
 
     //初始化curl    
     CURL *handle = curl_easy_init();
-
-
-    URL.replace(" ","%20");//A8我被你的带空格文件名坑得好惨啊!!!!!!!!!!X2!
     curl_easy_setopt(handle, CURLOPT_URL, URL.toStdString().c_str());//指定网址    
     //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header
     //curl_easy_setopt(handle, CURLOPT_NOBODY, 1);    //不需要body
@@ -98,26 +100,34 @@ int httpDownLoad(QString URL,QString Path)
     curl_easy_setopt(handle,CURLOPT_MAXCONNECTS,20);//设置最大连接数
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);//不下载>400页面
     curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0L);//获取进度信息
-    curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
+    curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION, progress_callback);//进度条
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1L);//openssl编译时使用curl官网或者firefox导出的第三方根证书文件
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(handle, CURLOPT_CAINFO, crtPath.toStdString().c_str());/* 证书路径 */
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);//收到数据反调
-    if(pagefile)
+    if(pagefile)//文件打开成功则开始下载
     {
+        //emit tworkMessageBox(0,"test","test");
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
         int curlreint=curl_easy_perform(handle);
         reint = fclose(pagefile);
-        qDebug()<<"fclose reint "<<reint;
         if(curlreint == CURLE_OK)
         {
             return curlreint;
         }else{
-            QMessageBox::warning(NULL,"下载文件","错误:"+QString::number(curlreint));
+            qDebug()<<"下载文件错误"<<curlreint;
+            emit tworkMessageBox(1,"下载文件","错误:"+QString::number(curlreint));
             reint = -3;
         }
         if(reint!=0){
             qDebug()<<"closeflie?.?"<<reint;
+            /*
+            Start::tMessageBox(1,
+                        "fclose in http.cpp",
+                        "错误:"+QString::number(reint)
+                        );*/
+            qDebug()<<"关闭文件时错误"<<reint;
+            emit tworkMessageBox(1,"关闭文件","错误:"+QString::number(reint));
         }
 
     }
@@ -136,7 +146,6 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
     retSize = fwrite(ptr,size,nmemb,pFile);
     //cout<<size*nmemb<<"bytes"<<" received!"<<endl;
     fflush(pFile);
-    //return retSize;
     return retSize;
 
 }
@@ -148,15 +157,11 @@ int progress_callback(void *clientp,//用户自定义参数,通过设置CURLOPT_
                       )//返回非0将会中断传输，错误代码是 CURLE_ABORTED_BY_CALLBACK
 {
     QString tem;
-
-
     Start::dlworking(dlnow,dltotal);
-
     //Start &mutualStart = Start::getInstance();
     //Start *nowStart=(Start*)(Start::mutualStart);
     //nowStart->tworkDlnow(tem);
     //mutualStart.tworkDlnow(tem);
-
     return 0;
 }
 QString conver(LONG64 l)

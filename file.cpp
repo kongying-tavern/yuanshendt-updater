@@ -1,4 +1,4 @@
-#include "file.h"
+﻿#include "file.h"
 #include "mainwindow.h"
 #include <QDebug>
 #include <QtWidgets/QMessageBox>
@@ -73,7 +73,7 @@ bool createFolderSlot(QString path)
     res = dir.mkpath(path);
     qDebug() << "新建目录" << res;
     }else{
-        qDebug() << "目录已存在" ;
+        qDebug() << "目录已存在"<<path;
         res = true;
     }
     return res;

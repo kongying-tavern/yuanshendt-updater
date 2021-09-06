@@ -29,7 +29,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>空荧酒馆在线下载&amp;更新器</string>
+   <string>空荧地图更新器</string>
   </property>
   <property name="windowIcon">
    <iconset resource="UpdateProgram.qrc">

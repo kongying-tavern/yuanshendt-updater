@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QObject>
 #include <QThread>
@@ -6,6 +6,7 @@
 
 
 #include <Windows.h>
+
 #include <iostream>
 #include <io.h>
 #include <string>
@@ -24,10 +25,12 @@ class Start : public QObject
 public:
     Start(QString dir, QObject *parent);
     ~Start();
+    void updaterErr();
+    void relaytworkMessageBox(int tag,QString title,QString txt);
+
+public:
     static void stsworkProcess(int a,int b);
     static void dlworking(LONG64 dlnow,LONG64 dltotal);
-public:
-
 private:
     //static Start *thisInstance;
 
@@ -39,13 +42,14 @@ private slots:
 
 
 private:
-
+    HTTP *http=nullptr;
 signals:
     void tstart();
 signals:
     //void tworkError(int errorCode);
     void tworkProcess(int a,int b);
     void tworkFinished(bool done);
+    void tworkMessageBox(int tag,QString title,QString txt);
 
 };
 QString tNowWork();
