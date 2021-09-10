@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QThreadPool>
 #include <QString>
 
 
@@ -14,9 +15,18 @@
 #include "HTTP.h"
 using namespace std;
 static QString threadWorking;
-static LONG64 a1;
-static LONG64 a2;
-static LONG64 b;
+
+struct stnetspeed
+{
+    LONG64 hisDl;
+    LONG64 dl;
+    LONG64 total;
+    void *tid;
+    QString path;
+};
+static stnetspeed netspeed[3];
+static int totalFile;
+static int doneFile;
 class Start : public QObject
 {
     Q_OBJECT
@@ -27,22 +37,25 @@ public:
     ~Start();
     void updaterErr();
     void relaytworkMessageBox(int tag,QString title,QString txt);
-
+    void stopWork();
 public:
-    static void stsworkProcess(int a,int b);
-    static void dlworking(LONG64 dlnow,LONG64 dltotal);
+    static Start *thisInstance;
+    static void dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path);
 private:
-    //static Start *thisInstance;
 
     QThread *workProcess = nullptr;
+    QThreadPool *tpoolhttp = nullptr;
     QString dir;
+    HTTP *http=nullptr;
+    HTTP *thttp=nullptr;
+
+
 
 private slots:
     void work();
+    void dldone();
+public slots:
 
-
-private:
-    HTTP *http=nullptr;
 signals:
     void tstart();
 signals:
@@ -51,8 +64,9 @@ signals:
     void tworkFinished(bool done);
     void tworkMessageBox(int tag,QString title,QString txt);
 
+
 };
-QString tNowWork();
+QString tNowWork(int &a,int &b);
 
 
 

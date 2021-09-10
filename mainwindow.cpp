@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
 
     //qDebug()<<(pathStr);
     ui->setupUi(this);
-    mutualUi = this;/*托管初始化，非常重要*/
+    mutualUi = this;//托管初始化，非常重要
     this->setWindowFlag(Qt::FramelessWindowHint); // 无边框窗口
     setAttribute(Qt::WA_TranslucentBackground, true);  // 背景透明
 
@@ -133,13 +133,18 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *e)//鼠标任何按键松开
 {
     if(windowsMoveOn){windowsMoveOn=false;}
 }
+
 void MainWindow::on_pushButton_Exit_clicked()//关闭按钮被单击
 {
     updaterIsRunning = false;
+    qDebug()<<"关闭按钮被单击";
+    if(ttstart)
+    {
+        ttstart->stopWork();
+    }
     QApplication* app;
     app->exit(0);
 }
-
 
 
 void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_search(多线程已完成)*/
@@ -219,8 +224,10 @@ void MainWindow::startThread(QString path)
     //连接工作触发信号
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
     connect(ttstart, &Start::tworkProcess, this, &MainWindow::Work_Process);
+
     connect(ttstart, &Start::tworkFinished, this, &MainWindow::Work_Finished);
     connect(ttstart, &Start::tworkMessageBox, this, &MainWindow::Work_MessageBox);
+    //connect(this,&MainWindow::stopTwork,ttstart,&Start::stopWork,Qt::DirectConnection);
 
     //开始工作
     timer1 = startTimer(500);//0.5s定时器
@@ -231,10 +238,14 @@ void MainWindow::timerEvent(QTimerEvent *event)
     //qDebug()<<"timerShot:"<<event->timerId();
     if(event->timerId()==timer1)
     {
-        //qDebug()<<"0.5s计时器";
-        QString tem =tNowWork();
+        int a;
+        int b;
+        QString tem =tNowWork(a,b);
+        MainWindow::Work_Process(a,b);
        // qDebug()<<tem;
-        if(tem!="")ui->label_Dlnow->setText(tem);
+        //if(tem!="")ui->label_Dlnow->setText(tem);
+        if(tem!="")MainWindow::changeMainPage0label_Text(tem);
+
     }
 }
 void MainWindow::Work_Finished(bool done)

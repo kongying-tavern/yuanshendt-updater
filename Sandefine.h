@@ -18,10 +18,9 @@
 "打开我的电脑\r\n"\
 "复制以下路径并打开:\r\n"\
 "%temp%\\yuanshendt\\Updater\\log\\\r\n"\
-"将文件.......\r\n"\
-"2群3群发给A8(AAAAAAAA)\r\n"\
-"其他群发给SanMeb\r\n\r\n"\
-"群号参见\r\n"\
+"添加群228382171\r\n"\
+"将文件发给SanMeb\r\n\r\n"\
+"另交流群群号参见\r\n"\
 "https://yuanshen.site/docs/communication-group.html\r\n"\
 "谢谢!\r\n\r\n"\
 "之后还请使用安装包或压缩包安装\r\n"\

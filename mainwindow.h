@@ -36,14 +36,15 @@ protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
-
 private slots:
     void on_pushButton_Start_clicked();
     void on_pushButton_Exit_clicked();
     //多线程窗口更新
     void Work_Process(int a,int b);
     void Work_Finished(bool done);
-
+    //停止Strat线程
+signals:
+    void stopTwork();
 public:
     static MainWindow *mutualUi;
     /*窗口控制托管sub*/

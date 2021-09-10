@@ -6,9 +6,10 @@
 #include <QUrl>
 #include <QtConcurrent>
 #include <QFileInfo>
+
+
 #include "file.h"
 #include "MD5.h"
-
 #include "Sandefine.h"
 #include "Json.h"
 #include "mainwindow.h"
@@ -17,13 +18,16 @@
 Start::Start(QString dir, QObject *parent)
     : QObject(parent)
 {
+    http = new HTTP("","",NULL);
+    connect(this, &Start::tstart, this, &Start::work);
+    connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
+    //connect(http, &HTTP::dldone, this, &Start::dldone);
+    //thisInstance = this;
     workProcess = new QThread;
     moveToThread(workProcess);
     workProcess->start();
     this->dir = dir;
-    http = new HTTP(NULL);
-    connect(this, &Start::tstart, this, &Start::work);
-    connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
+
 }
 
 Start::~Start()
@@ -31,25 +35,86 @@ Start::~Start()
 
 }
 
+void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
+{
 
-void Start::dlworking(LONG64 dlnow,LONG64 dltotal)
-{
-    a1=dlnow;
-    b=dltotal;
-}
-QString tNowWork()
-{
-    //qDebug()<<a1<<a2<<b;
-    if(b==0)
+    //qDebug()<<tid<<path<<dlnow<<dltotal;
+    //qDebug()<<tid<<&tid<<path;
+    for(int i=0;i<3;++i)
     {
-        return "";
+        //清理已完成的任务
+        if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
+        {
+
+            qDebug()<<"end dl in"<<netspeed[i].tid<<netspeed[i].path;
+            netspeed[i].tid=NULL;
+            netspeed[i].dl=0;
+            netspeed[i].hisDl=0;
+            netspeed[i].total=0;
+            netspeed[i].path="";
+            //emit dldone();
+        }
     }
-    //qDebug()<<"计算网速";
-    int p = (int)(100*((double)a1/(double)b));
-    //qDebug()<<p;
-    QString tem = conver((a1-a2)*2);
-    a2=a1;
-    return QString::number(p)+"%|"+tem;
+    for(int i=0;i<3;++i)
+    {
+
+        if(netspeed[i].tid==NULL && path!="")
+        {
+            //新下载线程开始
+            qDebug()<<"new dl in"<<tid<<path;
+            netspeed[i].tid=tid;
+            netspeed[i].path=path;
+
+            break;
+        }
+        if(netspeed[i].tid==tid)
+        {
+            //正在下载的线程
+            netspeed[i].dl=dlnow;
+            netspeed[i].total=dltotal;
+            break;
+        }
+
+    }
+
+}
+void Start::dldone()
+{
+    emit tworkProcess(doneFile++,totalFile);
+}
+QString tNowWork(int &a,int &b)
+{
+    //return "";
+    int p;
+    LONG64 s;
+    QString tem="";
+    QString tems="0.00B/s";
+    for(int i=0;i<3;++i)
+    {
+        if(netspeed[i].path!="" && netspeed[i].dl<netspeed[i].total)
+        {
+            //计算已下载的百分比
+            p = (int)(100*((double)netspeed[i].dl/(double)netspeed[i].total));
+            if(p<0)p=0;
+            //下载速度格式化
+            s = (netspeed[i].dl-netspeed[i].hisDl)*2;
+            if(s>0)tems=conver(s);
+            //下载信息构造
+            tem+=QString::number(p)+"% | "
+                 +tems+" | "
+                 +netspeed[i].path
+                 ;
+            //下载字节数缓存
+            netspeed[i].hisDl=netspeed[i].dl;
+
+            p=0;
+            tems="0.00B/s";
+            if(i<2)tem+="\n";
+        }
+    }
+    a=doneFile;
+    b=totalFile;
+    return tem;
 }
 void Start::updaterErr()
 {
@@ -61,16 +126,19 @@ void Start::updaterErr()
                          "自动更新失败",
                          uperr);
 }
-
+void Start::stopWork()
+{
+    if(tpoolhttp->activeThreadCount()>0)
+    {
+        qDebug()<<"停止线程池";
+        tpoolhttp->thread()->terminate();
+    }
+}
 void Start::work()
 {
 
-    a1=0;
-    a2=0;
-    b=0;
-    //mutualStart = this;
     QString path=this->dir;
-
+    //Start::updaterErr();
     //return;
     MainWindow::mutualUi->changeMainPage(0);
     qDebug()<<"工作目标："<<path;
@@ -111,7 +179,6 @@ void Start::work()
     createFolderSlot(tempPath);
     /*在临时目录释放crt证书*/
     httpcrt();
-
 
     /*获取在线md5******************************************************/
     /* 获取在线文件md5
@@ -169,40 +236,37 @@ void Start::work()
      MainWindow::mutualUi->changeProgressBarColor(
                  QString("#3880cc")
                  ,QString("#00c500"));
-     int retry=0;
-    for(int i = 0; i< needUpdate.size();++i)
-    {
+     int retry=0;//多线程下载如何重试QAQ
+     totalFile=needUpdate.size();
+     doneFile=0;
+     //初始libcurl线程池
+     tpoolhttp=QThreadPool::globalInstance();
+     tpoolhttp->setMaxThreadCount(3);
+     tpoolhttp->setExpiryTimeout(-1);
 
-        //qDebug()<<"开始下载:"<<needUpdate.at(i);
-        //构造下载链接
-        QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
-        QString dlpath="Map/"+QString(needUpdate.at(i));
-        qDebug()<<"downloadurl :"<<url;
-        qDebug()<<"downloadpath:"<<dlpath;
+     for(int i = 0; i< needUpdate.size();++i)
+     {
 
-        //QMessageBox::information(NULL,QString::number(i),dlpath);
-        a1=0;
-        a2=0;
-        b=0;
-        MainWindow::mutualUi->changeMainPage0label_Text("下载需要更新的文件:"+needUpdate.at(i));
-        emit tworkProcess(i,needUpdate.size());
+         //qDebug()<<"开始下载:"<<needUpdate.at(i);
+         //构造下载链接
+         QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
+         QString dlpath="Map/"+QString(needUpdate.at(i));
+         //qDebug()<<"downloadurl :"<<url;
+         //qDebug()<<"downloadpath:"<<dlpath;
 
-        if(http->httpDownLoad(url,dlpath)==0)
-        {
-            retry=0;
-        }else{
-            retry++;
-        }
-        if(retry>1){
-            Start::updaterErr();
-            return;
-        }
-        //Sleep(100);
+         thttp = new HTTP(url,dlpath,this);
+         connect(thttp,&HTTP::dldone,this,&Start::dldone,Qt::DirectConnection);
+         tpoolhttp->start(thttp);
 
-    }
-    qDebug()<<"下载完成";
-    //MainWindow::mutualUi->changeMainPage0label_Text("下载完成");
-    /*移动文件至目标目录*********************************************/
+         //QThread::sleep(1);
+     }
+
+     //tpoolhttp->activeThreadCount();
+     tpoolhttp->waitForDone(-1);
+     tpoolhttp->clear();
+     qDebug()<<"下载完成";
+     //MainWindow::mutualUi->changeMainPage0label_Text("下载完成");
+     /*移动文件至目标目录*********************************************/
      /*
       * 移动文件
       * 下载好的地图存在%temp%\download\Map\
@@ -253,7 +317,7 @@ void Start::work()
             qDebug()<<"移动失败第"<<f<<"次";
             f++;
             i--;
-            if(f>3)
+            if(f>1)
             {
                 Start::updaterErr();
                 return;

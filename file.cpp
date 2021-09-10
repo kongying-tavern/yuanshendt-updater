@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include "Start.h"
 #include "Sandefine.h"
+using namespace std;
 /*遍历目录*/
 void file_search(QString path,QStringList &fileList)
 {
@@ -87,7 +88,7 @@ void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPat
     createFolderSlot(info.path());
     QFile::copy(resFile,destFullPathFileName);
 }
-/*读取文件并返回json字符串*/
+/*读取文本文件并返回字符串*/
 QString readTXT(QString Path)
 {
     qDebug()<<"读取文件"<<Path;
@@ -112,6 +113,8 @@ QString readTXT(QString Path)
 /*对比获取需要更新的文件*/
 QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStringList newFilePath,QStringList newFileMD5,QString lworkPath="")
 {
+
+    /*已弃用*/
     QStringList needupdater;
     int oldsize = localFileMD5.size();
     int newsize = newFileMD5.size();
@@ -159,9 +162,9 @@ bool moveFile(QString oldPath,QString newPath)
     bool re;
     QFile nfile(newPath);
 
-    if(!nfile.remove())
+    if(nfile.exists())
     {
-        qDebug()<<"removeFile X";
+        if(!nfile.remove())qDebug()<<"removeFile X";
     }
     QFile ofile(oldPath);
     if(ofile.isOpen())
@@ -182,12 +185,15 @@ bool moveFile(QString oldPath,QString newPath)
 //                        newPath.toLocal8Bit().constData()
 //                        );
             int reint;
+            reint=remove(newPath.replace("/","\\").toLocal8Bit().constData());
+            qDebug()<<"FILE * R:"<<reint<<GetLastError();
             reint = rename(
                         oldPath.replace("/","\\").toLocal8Bit().constData(),
                         newPath.replace("/","\\").toLocal8Bit().constData()
                         );
-            qDebug()<<"FILE * E:"<<reint;
-            qDebug()<<GetLastError();
+            qDebug()<<"FILE * E:"<<reint<<GetLastError();
+            //fopen(newPath.toStdString().c_str(),"wd");
+            //qDebug()<<GetLastError();
             if(reint==0)re=true;
         }
         return re;
