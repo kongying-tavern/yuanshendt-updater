@@ -207,7 +207,7 @@ void Start::work()
     emit tworkProcess(0,1);//进度条归零
 
     QStringList needUpdate;
-
+    QStringList needUpdateMD5;
     qDebug()<<"按需读取本地文件MD5:"<<path;
 
     for(int i = 0; i< newFileList.size();++i)
@@ -219,6 +219,7 @@ void Start::work()
             MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
             qDebug()<<"MD5不匹配:"<<dir+"/"+newFileList.at(i);
             needUpdate<<newFileList.at(i);
+            needUpdateMD5<<newFileMD5.at(i);
         }
     }
     //return;
@@ -243,26 +244,29 @@ void Start::work()
 
      for(int i = 0; i< needUpdate.size();++i)
      {
+         if(needUpdateMD5.at(i)!=getFlieMD5(tempPath+"download/Map/"+needUpdate.at(i)))
+         {
+             qDebug()<<"全新下载";
+             //构造下载链接
+             QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
+             QString dlpath="Map/"+QString(needUpdate.at(i));
+             //qDebug()<<"downloadurl :"<<url;
+             //qDebug()<<"downloadpath:"<<dlpath;
 
-         //qDebug()<<"开始下载:"<<needUpdate.at(i);
-         //构造下载链接
-         QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
-         QString dlpath="Map/"+QString(needUpdate.at(i));
-         //qDebug()<<"downloadurl :"<<url;
-         //qDebug()<<"downloadpath:"<<dlpath;
+             thttp = new HTTP(url,dlpath,this);
+             connect(thttp,&HTTP::dldone
+                     ,this,&Start::dldone
+                     ,Qt::DirectConnection
+                     );
+             connect(thttp, &HTTP::tworkMessageBox
+                     , this, &Start::tworkMessageBox
+                     ,Qt::DirectConnection
+                     );
+             tpoolhttp->start(thttp);
+         }else{
+             qDebug()<<needUpdate.at(i)<<"已下载";
+         }
 
-         thttp = new HTTP(url,dlpath,this);
-         connect(thttp,&HTTP::dldone
-                 ,this,&Start::dldone
-                 ,Qt::DirectConnection
-                 );
-         connect(thttp, &HTTP::tworkMessageBox
-                 , this, &Start::tworkMessageBox
-                 ,Qt::DirectConnection
-                 );
-         tpoolhttp->start(thttp);
-
-         //QThread::sleep(1);
      }
 
      //tpoolhttp->activeThreadCount();
@@ -283,9 +287,6 @@ void Start::work()
     int f=0;
     for(int i = 0; i< needUpdate.size();++i)
     {
-
-
-
 
         //构造新旧文件名
         QString oldPath=getTempPath("temp")+
