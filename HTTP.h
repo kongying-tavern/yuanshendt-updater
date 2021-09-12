@@ -35,6 +35,9 @@ protected:
 private:
     QString turl;
     QString tdlpath;
+    void *tid;
+    FILE *pagefile;
+    CURL *handle;
 private slots:
 
 signals:

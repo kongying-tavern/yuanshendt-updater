@@ -40,7 +40,8 @@ HEADERS += \
     Sandefine.h \
     Start.h \
     file.h \
-    mainwindow.h
+    mainwindow.h \
+    my.rc
 
 FORMS += \
     mainwindow.ui

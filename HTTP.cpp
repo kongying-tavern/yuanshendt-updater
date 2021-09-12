@@ -16,21 +16,23 @@
 #include <QByteArray>
 using namespace std;
 //初始化
+
+
 HTTP::HTTP(QString URL,QString Path,QObject *parent)
     : QObject(parent)
 {
-    qDebug()<<URL<<Path;
+
     this->turl=URL;
     this->tdlpath=Path;
 
 }
 HTTP::~HTTP()
 {
-
+    qDebug()<<"HTTP被销毁:"<<&tid;
 }
 void httpcrt()
 {
-
+    qDebug()<<"释放crt";
     crtPath=getTempPath("temp")+updaterTempDir+"crt/crt.crt";
     QFileInfo info(crtPath);
     saveResourecFile("CRT",                             //资源文件前缀
@@ -46,6 +48,9 @@ void HTTP::run()
         qDebug()<<"无传参";
         return;
     }
+    tid=QThread::currentThreadId();//这东西必须放在线程启动后,否则变单线程
+    qDebug()<<"HTTP被创建:"<<&tid;
+    qDebug()<<"任务:"<<this->turl<<this->tdlpath;
     HTTP::httpDownLoad(this->turl,this->tdlpath);
 }
 int HTTP::httpDownLoad(QString URL,QString Path)
@@ -54,20 +59,15 @@ int HTTP::httpDownLoad(QString URL,QString Path)
      * 下载的文件将保存在临时目录/download/
      * 文件名 Path
      */
-    void *tid=QThread::currentThreadId();
-
-
     int reint = -10;
     QFileInfo info(getTempPath("temp")+updaterTempDir+"download/"+Path);
-    qDebug()<<tid<<"即将下载文件:"<<URL;
-    qDebug()<<tid<<"准备创建目录:"<<info.path();
-    qDebug()<<tid<<"即将打开文件:"<<getTempPath("temp")+updaterTempDir+"download/"+Path;
+    qDebug()<<&tid<<"URL:"<<URL;
+    qDebug()<<&tid<<"准备创建目录:"<<info.path();
+    qDebug()<<&tid<<"即将打开文件:"<<getTempPath("temp")+updaterTempDir+"download/"+Path;
     createFolderSlot(info.path());
-    //return 0;
 
     //创建文件准备写入
-
-    FILE *pagefile=NULL;
+    pagefile=NULL;
     int err;
     err = fopen_s(&pagefile,
                   (
@@ -89,14 +89,15 @@ int HTTP::httpDownLoad(QString URL,QString Path)
                       "wb"
                       );
     }
-    qDebug()<<tid<<"打开的文件句柄"<<&pagefile<<"|"<<err;
+    qDebug()<<&tid<<"打开的文件"<<&pagefile<<"|"<<err;
     if(err!=0)
     {
         fclose(pagefile);
         return err;
     }
     //初始化curl    
-    CURL *handle = curl_easy_init();
+    handle = curl_easy_init();
+    qDebug()<<"创建的libcurl:"<<&handle;
     curl_easy_setopt(handle, CURLOPT_URL, URL.toStdString().c_str());//指定网址    
     //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header
     //curl_easy_setopt(handle, CURLOPT_NOBODY, 1);    //不需要body
@@ -108,31 +109,29 @@ int HTTP::httpDownLoad(QString URL,QString Path)
     curl_easy_setopt(handle,CURLOPT_XFERINFODATA,tid);//线程ID
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1L);//openssl编译时使用curl官网或者firefox导出的第三方根证书文件
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 2L);
-    curl_easy_setopt(handle, CURLOPT_CAINFO, crtPath.toStdString().c_str());/* 证书路径 */
+    curl_easy_setopt(handle, CURLOPT_CAINFO, crtPath.toStdString().c_str());//证书路径
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, this->write_data);//收到数据反调
     if(pagefile)//文件打开成功则开始下载
     {
-        Start::dlworking(0,0,tid,Path);
-        curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);
-        int curlreint=curl_easy_perform(handle);
+        Start::dlworking(0,0,tid,Path);//通知Start线程本线程下载的文件
+        curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);//数据流定向至FILE *
+        qDebug()<<&tid<<"下载开始";
+        int curlreint=curl_easy_perform(handle);//开始下载
         reint = fclose(pagefile);
         if(curlreint == CURLE_OK)
         {
+            qDebug()<<&tid<<"下载完成";
             emit dldone();
-            return curlreint;
         }else{
-            qDebug()<<tid<<"下载文件错误"<<curlreint;
+            qDebug()<<&tid<<"下载文件错误"<<curlreint;
             emit tworkMessageBox(1,"下载文件","错误:"+QString::number(curlreint)+"\r\n"+Path);
-            reint = -3;
         }
         if(reint!=0){
             qDebug()<<"closeflie?.?"<<reint;
-            qDebug()<<tid<<"关闭文件时错误"<<reint;
+            qDebug()<<&tid<<"关闭文件时错误"<<reint;
             emit tworkMessageBox(1,"关闭文件","错误:"+QString::number(reint)+"\r\n"+Path);
         }
-
     }
-
     curl_easy_cleanup(handle);
     //curl_global_init(CURL_GLOBAL_ALL);
     //curl_global_cleanup();
@@ -158,10 +157,10 @@ int HTTP::progress_callback(void *clientp,//用户自定义参数,通过设置CU
                       curl_off_t ulnow//已经上传的字节数
                       )//返回非0将会中断传输，错误代码是 CURLE_ABORTED_BY_CALLBACK
 {
-    Start::dlworking(dlnow,dltotal,clientp,"");
+    Start::dlworking(dlnow,dltotal,clientp,"");//进度报告
     return 0;
 }
-QString conver(LONG64 l)
+QString conver(LONG64 l)//下载速度格式化
 {
     QString restr;
     if(l<1024)

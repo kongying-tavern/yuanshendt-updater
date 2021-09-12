@@ -18,7 +18,8 @@
 Start::Start(QString dir, QObject *parent)
     : QObject(parent)
 {
-    http = new HTTP("","",NULL);
+    qDebug()<<"Start被创建";
+    http = new HTTP("","",NULL);//单线程下载
     connect(this, &Start::tstart, this, &Start::work);
     connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
     //connect(http, &HTTP::dldone, this, &Start::dldone);
@@ -32,27 +33,23 @@ Start::Start(QString dir, QObject *parent)
 
 Start::~Start()
 {
-
+    qDebug()<<"Start被销毁";
 }
 
 void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
 {
-
-    //qDebug()<<tid<<path<<dlnow<<dltotal;
-    //qDebug()<<tid<<&tid<<path;
     for(int i=0;i<3;++i)
     {
         //清理已完成的任务
         if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
         {
-
             qDebug()<<"end dl in"<<netspeed[i].tid<<netspeed[i].path;
             netspeed[i].tid=NULL;
             netspeed[i].dl=0;
             netspeed[i].hisDl=0;
             netspeed[i].total=0;
-            netspeed[i].path="";
-            //emit dldone();
+            //netspeed[i].path="";
+            //emit dldone();//会被重复调用几次,不能放这
         }
     }
     for(int i=0;i<3;++i)
@@ -74,9 +71,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             netspeed[i].total=dltotal;
             break;
         }
-
     }
-
 }
 void Start::dldone()
 {
@@ -91,7 +86,10 @@ QString tNowWork(int &a,int &b)
     QString tems="0.00B/s";
     for(int i=0;i<3;++i)
     {
-        if(netspeed[i].path!="" && netspeed[i].dl<netspeed[i].total)
+        //if(netspeed[i].path!="" && netspeed[i].dl<netspeed[i].total)
+        //↑小文件不显示
+        //↓现在也不怎么样,0.5秒下完三四个小文件是常事
+        if(netspeed[i].path!="")
         {
             //计算已下载的百分比
             p = (int)(100*((double)netspeed[i].dl/(double)netspeed[i].total));
@@ -189,7 +187,6 @@ void Start::work()
 
     MainWindow::mutualUi->changeMainPage0label_Text("获取在线文件MD5...");
     http->httpDownLoad(dlurl"md5.json","md5.json");
-
     /*读取在线文件md5.json到
       * QJson  newmd5.json
       * 字符串  QString newMD5Str
@@ -255,7 +252,14 @@ void Start::work()
          //qDebug()<<"downloadpath:"<<dlpath;
 
          thttp = new HTTP(url,dlpath,this);
-         connect(thttp,&HTTP::dldone,this,&Start::dldone,Qt::DirectConnection);
+         connect(thttp,&HTTP::dldone
+                 ,this,&Start::dldone
+                 ,Qt::DirectConnection
+                 );
+         connect(thttp, &HTTP::tworkMessageBox
+                 , this, &Start::tworkMessageBox
+                 ,Qt::DirectConnection
+                 );
          tpoolhttp->start(thttp);
 
          //QThread::sleep(1);

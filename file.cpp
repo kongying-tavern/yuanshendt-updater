@@ -10,9 +10,11 @@
 #include "Start.h"
 #include "Sandefine.h"
 using namespace std;
-/*遍历目录*/
-void file_search(QString path,QStringList &fileList)
+
+void file_search(QString path,QStringList &fileList)//已弃用
 {
+    /*已弃用*/
+    /*遍历目录*/
     //path=path.replace("/","\\")+"\\";
     //path =path.replace(" ","%20")+"/";
     //qDebug()<<"开始遍历目标目录:"<<path;
@@ -71,10 +73,10 @@ bool createFolderSlot(QString path)
     QDir dir;
     if (!dir.exists(path))
     {
-    res = dir.mkpath(path);
-    qDebug() << "新建目录" << res;
+        res = dir.mkpath(path);
+        qDebug()<<"新建目录"<<path<<res;
     }else{
-        qDebug() << "目录已存在"<<path;
+        qDebug()<<"目录已存在"<<path;
         res = true;
     }
     return res;
@@ -111,7 +113,12 @@ QString readTXT(QString Path)
     return TXT;
 }
 /*对比获取需要更新的文件*/
-QStringList getUptater(QStringList localFilePath,QStringList localFileMD5,QStringList newFilePath,QStringList newFileMD5,QString lworkPath="")
+QStringList getUptater(QStringList localFilePath
+                       ,QStringList localFileMD5
+                       ,QStringList newFilePath
+                       ,QStringList newFileMD5
+                       ,QString lworkPath=""
+                       )//已弃用
 {
 
     /*已弃用*/
@@ -180,10 +187,6 @@ bool moveFile(QString oldPath,QString newPath)
         if(!re)
         {
             qDebug()<<"?";
-//            re = QFile::rename(
-//                        oldPath.toLocal8Bit().constData(),
-//                        newPath.toLocal8Bit().constData()
-//                        );
             int reint;
             reint=remove(newPath.replace("/","\\").toLocal8Bit().constData());
             qDebug()<<"FILE * R:"<<reint<<GetLastError();
@@ -192,8 +195,6 @@ bool moveFile(QString oldPath,QString newPath)
                         newPath.replace("/","\\").toLocal8Bit().constData()
                         );
             qDebug()<<"FILE * E:"<<reint<<GetLastError();
-            //fopen(newPath.toStdString().c_str(),"wd");
-            //qDebug()<<GetLastError();
             if(reint==0)re=true;
         }
         return re;
