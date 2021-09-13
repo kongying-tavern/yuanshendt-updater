@@ -41,13 +41,15 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
     for(int i=0;i<3;++i)
     {
         //清理已完成的任务
-        if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
+        //if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
+        if( netspeed[i].isdling==true && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
         {
-            qDebug()<<"end dl in"<<netspeed[i].tid<<netspeed[i].path;
-            netspeed[i].tid=NULL;
-            netspeed[i].dl=0;
-            netspeed[i].hisDl=0;
-            netspeed[i].total=0;
+            qDebug()<<"end dl in"<<&netspeed[i].tid<<netspeed[i].path;
+            netspeed[i].isdling=false;
+            netspeed[i].tid=NULL;            
+            //netspeed[i].dl=0;
+            //netspeed[i].hisDl=0;
+            //netspeed[i].total=0;
             //netspeed[i].path="";
             //emit dldone();//会被重复调用几次,不能放这
         }
@@ -58,8 +60,12 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         if(netspeed[i].tid==NULL && path!="")
         {
             //新下载线程开始
-            qDebug()<<"new dl in"<<tid<<path;
+            qDebug()<<"new dl in"<<&tid<<path;
+            netspeed[i].isdling=true;
             netspeed[i].tid=tid;
+            netspeed[i].dl=0;
+            netspeed[i].hisDl=0;
+            netspeed[i].total=0;
             netspeed[i].path=path;
 
             break;
@@ -130,6 +136,7 @@ void Start::stopWork()
     {
         qDebug()<<"停止线程池";
         tpoolhttp->thread()->terminate();
+        this->thread()->terminate();
     }
 }
 void Start::work()
@@ -265,6 +272,7 @@ void Start::work()
              tpoolhttp->start(thttp);
          }else{
              qDebug()<<needUpdate.at(i)<<"已下载";
+             Start::dldone();
          }
 
      }

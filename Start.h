@@ -18,6 +18,7 @@ static QString threadWorking;
 
 struct stnetspeed
 {
+    bool isdling=false;
     LONG64 hisDl;
     LONG64 dl;
     LONG64 total;
