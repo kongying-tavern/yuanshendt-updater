@@ -20,7 +20,9 @@ struct stnetspeed
 {
     bool isdling=false;
     LONG64 hisDl;
+    qint64 hisDlt;
     LONG64 dl;
+    qint64 dlt;
     LONG64 total;
     void *tid;
     QString path;
@@ -67,7 +69,7 @@ signals:
 
 
 };
-QString tNowWork(int &a,int &b);
+QString tNowWork();
 
 
 

@@ -7,7 +7,6 @@
 #include <QtConcurrent>
 #include <QFileInfo>
 
-
 #include "file.h"
 #include "MD5.h"
 #include "Sandefine.h"
@@ -46,12 +45,13 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         {
             qDebug()<<"end dl in"<<&netspeed[i].tid<<netspeed[i].path;
             netspeed[i].isdling=false;
-            netspeed[i].tid=NULL;            
+            netspeed[i].tid=NULL;
             //netspeed[i].dl=0;
             //netspeed[i].hisDl=0;
             //netspeed[i].total=0;
             //netspeed[i].path="";
             //emit dldone();//会被重复调用几次,不能放这
+            MainWindow::mutualUi->updataDlingmag();
         }
     }
     for(int i=0;i<3;++i)
@@ -64,7 +64,9 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             netspeed[i].isdling=true;
             netspeed[i].tid=tid;
             netspeed[i].dl=0;
+            netspeed[i].dlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].hisDl=0;
+            netspeed[i].hisDlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=0;
             netspeed[i].path=path;
 
@@ -74,6 +76,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         {
             //正在下载的线程
             netspeed[i].dl=dlnow;
+            netspeed[i].dlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=dltotal;
             break;
         }
@@ -83,41 +86,40 @@ void Start::dldone()
 {
     emit tworkProcess(doneFile++,totalFile);
 }
-QString tNowWork(int &a,int &b)
+QString tNowWork()
 {
     //return "";
+    qint64 DETLAms;
     int p;
     LONG64 s;
     QString tem="";
     QString tems="0.00B/s";
     for(int i=0;i<3;++i)
     {
-        //if(netspeed[i].path!="" && netspeed[i].dl<netspeed[i].total)
-        //↑小文件不显示
-        //↓现在也不怎么样,0.5秒下完三四个小文件是常事
         if(netspeed[i].path!="")
         {
             //计算已下载的百分比
+            DETLAms=netspeed[i].dlt-netspeed[i].hisDlt;
             p = (int)(100*((double)netspeed[i].dl/(double)netspeed[i].total));
             if(p<0)p=0;
+
             //下载速度格式化
-            s = (netspeed[i].dl-netspeed[i].hisDl)*2;
+            //s = (netspeed[i].dl-netspeed[i].hisDl)*2;
+            s=(int)((double)(netspeed[i].dl-netspeed[i].hisDl)*((double)1000/(double)DETLAms));
             if(s>0)tems=conver(s);
             //下载信息构造
-            tem+=QString::number(p)+"% | "
-                 +tems+" | "
+            tem+=QString::number(p)+"%\t | "
+                 +QString(tems)+"\t | "
                  +netspeed[i].path
                  ;
             //下载字节数缓存
             netspeed[i].hisDl=netspeed[i].dl;
-
+            netspeed[i].hisDlt=netspeed[i].dlt;
             p=0;
             tems="0.00B/s";
             if(i<2)tem+="\n";
         }
     }
-    a=doneFile;
-    b=totalFile;
     return tem;
 }
 void Start::updaterErr()

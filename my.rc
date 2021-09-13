@@ -26,13 +26,13 @@ VS_VERSION_INFO VERSIONINFO
             BEGIN
                 VALUE "CompanyName", "\0"
                 VALUE "FileDescription", "¿ÕÓ«µØÍ¼¸üÐÂÆ÷"
-                VALUE "FileVersion", "1.1,6\0"
-                VALUE "ProductVersion", "1.1.6\0"
+                VALUE "FileVersion", "1.1,7\0"
+                VALUE "ProductVersion", "1.1.7\0"
                 VALUE "LegalCopyright", "\0"
                 VALUE "LegalTrademarks", "\0"
-                VALUE "OriginalFilename", "KYUpdater_v1.1.6_release.exe\0"
+                VALUE "OriginalFilename", "KYUpdater_v1.1.7_release.exe\0"
                 VALUE "ProductName", "YuanshendtUpdater\0\0"
-                VALUE "InternalName", "1.1.5.exe\0"
+                VALUE "InternalName", "202109131936.exe\0"
            END
         END
 

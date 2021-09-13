@@ -233,19 +233,18 @@ void MainWindow::startThread(QString path)
     timer1 = startTimer(500);//0.5s定时器
     emit ttstart->tstart();
 }
+void MainWindow::updataDlingmag()
+{
+    MainWindow::changeMainPage0label_Text(tNowWork());
+}
 void MainWindow::timerEvent(QTimerEvent *event)
 {
     //qDebug()<<"timerShot:"<<event->timerId();
     if(event->timerId()==timer1)
     {
-        int a;
-        int b;
-        QString tem =tNowWork(a,b);
-        MainWindow::Work_Process(a,b);
-       // qDebug()<<tem;
+        QString tem =tNowWork();
         //if(tem!="")ui->label_Dlnow->setText(tem);
         if(tem!="")MainWindow::changeMainPage0label_Text(tem);
-
     }
 }
 void MainWindow::Work_Finished(bool done)

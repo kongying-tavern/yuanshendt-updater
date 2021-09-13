@@ -58,7 +58,7 @@ public:
     /*多线程*/
     void threadWork(QString path);
     void startThread(QString path);
-
+    void updataDlingmag();
 public:
     //void msgBoxClosed(QAbstractButton*);//非模态消息框回调
 

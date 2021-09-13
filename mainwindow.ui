@@ -52,7 +52,7 @@
      <string notr="true">background:rgb(255,255,255);</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_Dling">
      <widget class="QLabel" name="label_Text">
@@ -68,6 +68,7 @@
        <font>
         <family>微软雅黑</family>
         <pointsize>-1</pointsize>
+        <kerning>false</kerning>
        </font>
       </property>
       <property name="styleSheet">
