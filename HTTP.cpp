@@ -28,7 +28,7 @@ HTTP::HTTP(QString URL,QString Path,QObject *parent)
 }
 HTTP::~HTTP()
 {
-    qDebug()<<"HTTP被销毁:"<<&tid;
+    qDebug()<<&tid<<"HTTP被销毁";
 }
 void httpcrt()
 {
@@ -49,8 +49,8 @@ void HTTP::run()
         return;
     }
     tid=QThread::currentThreadId();//这东西必须放在线程启动后,否则变单线程
-    qDebug()<<"HTTP被创建:"<<&tid;
-    qDebug()<<"任务:"<<this->turl<<this->tdlpath;
+    qDebug()<<&tid<<"HTTP被创建";
+    qDebug()<<&tid<<"任务:"<<this->turl<<this->tdlpath;
     HTTP::httpDownLoad(this->turl,this->tdlpath);
 }
 int HTTP::httpDownLoad(QString URL,QString Path)
@@ -127,7 +127,7 @@ int HTTP::httpDownLoad(QString URL,QString Path)
             emit tworkMessageBox(1,"下载文件","错误:"+QString::number(curlreint)+"\r\n"+Path);
         }
         if(reint!=0){
-            qDebug()<<"closeflie?.?"<<reint;
+            qDebug()<<&tid<<"closeflie?.?"<<reint;
             qDebug()<<&tid<<"关闭文件时错误"<<reint;
             emit tworkMessageBox(1,"关闭文件","错误:"+QString::number(reint)+"\r\n"+Path);
         }

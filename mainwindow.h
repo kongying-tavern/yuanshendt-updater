@@ -77,5 +77,4 @@ private:
 };
 
 bool exeIsRunning();
-//static void threadChangeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
 #endif // MAINWINDOW_H

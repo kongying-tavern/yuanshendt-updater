@@ -1,14 +1,15 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
-
-#include "qstring.h"
-#include <shlwapi.h>
-#include "Sandefine.h"
 #include <QString>
 #include <QFileDialog>
 #include <QProcess>
 #include <QPropertyAnimation>
+
+#include "qstring.h"
+#include <shlwapi.h>
+#include "Sandefine.h"
+
 #include <HTTP.h>
 
 
@@ -32,10 +33,10 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     //仙哥版窗口阴影
     //设置窗口四周阴影 - label_Shadow实现
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect;
-        shadow->setOffset(0, 0);//设置向哪个方向产生阴影效果(dx,dy)，特别地，(0,0)代表向四周发散
-        shadow->setColor(QColor(0, 0, 0, 50));//设置阴影颜色，也可以setColor(QColor(220,220,220))
-        shadow->setBlurRadius(15);//设定阴影的模糊半径，数值越大越模糊
-        ui->label_Shadow->setGraphicsEffect(shadow);
+    shadow->setOffset(0, 0);//设置向哪个方向产生阴影效果(dx,dy)，特别地，(0,0)代表向四周发散
+    shadow->setColor(QColor(0, 0, 0, 50));//设置阴影颜色，也可以setColor(QColor(220,220,220))
+    shadow->setBlurRadius(15);//设定阴影的模糊半径，数值越大越模糊
+    ui->label_Shadow->setGraphicsEffect(shadow);
 
 
     if(pathStr == nullptr)
@@ -207,7 +208,6 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
 void MainWindow::threadWork(QString path)
 {
     updaterIsRunning = true;
-    //QtConcurrent::run(this,&MainWindow::startThread,path);
     MainWindow::startThread(path);
 }
 void MainWindow::startThread(QString path)
@@ -223,10 +223,12 @@ void MainWindow::startThread(QString path)
     ttstart = new Start(path, NULL);
     //连接工作触发信号
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
-    connect(ttstart, &Start::tworkProcess, this, &MainWindow::Work_Process);
-
-    connect(ttstart, &Start::tworkFinished, this, &MainWindow::Work_Finished);
-    connect(ttstart, &Start::tworkMessageBox, this, &MainWindow::Work_MessageBox);
+    connect(ttstart, &Start::tworkProcess
+            ,this, &MainWindow::Work_Process);
+    connect(ttstart, &Start::tworkFinished
+            ,this, &MainWindow::Work_Finished);
+    connect(ttstart, &Start::tworkMessageBox
+            ,this, &MainWindow::Work_MessageBox);
     //connect(this,&MainWindow::stopTwork,ttstart,&Start::stopWork,Qt::DirectConnection);
 
     //开始工作

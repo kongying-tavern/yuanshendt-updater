@@ -7,6 +7,8 @@
 #include <QtConcurrent>
 #include <QFileInfo>
 
+#include <windows.h>
+
 #include "file.h"
 #include "MD5.h"
 #include "Sandefine.h"
@@ -43,7 +45,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         //if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
         if( netspeed[i].isdling==true && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
         {
-            qDebug()<<"end dl in"<<&netspeed[i].tid<<netspeed[i].path;
+            qDebug()<<&netspeed[i].tid<<"end dl"<<netspeed[i].path;
             netspeed[i].isdling=false;
             netspeed[i].tid=NULL;
             //netspeed[i].dl=0;
@@ -51,7 +53,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             //netspeed[i].total=0;
             //netspeed[i].path="";
             //emit dldone();//会被重复调用几次,不能放这
-            MainWindow::mutualUi->updataDlingmag();
+            MainWindow::mutualUi->updataDlingmag();//更新进度文本
         }
     }
     for(int i=0;i<3;++i)
@@ -60,7 +62,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         if(netspeed[i].tid==NULL && path!="")
         {
             //新下载线程开始
-            qDebug()<<"new dl in"<<&tid<<path;
+            qDebug()<<&tid<<"new dl"<<path;
             netspeed[i].isdling=true;
             netspeed[i].tid=tid;
             netspeed[i].dl=0;
@@ -284,6 +286,9 @@ void Start::work()
      tpoolhttp->clear();
      qDebug()<<"下载完成";
      //MainWindow::mutualUi->changeMainPage0label_Text("下载完成");
+     //qDebug()<<FindWindowW(NULL,(LPCWSTR)QString("「空荧酒馆」原神地图").unicode());//地图进程窗口
+
+     //return;
      /*移动文件至目标目录*********************************************/
      /*
       * 移动文件

@@ -7,6 +7,9 @@
 /*测试版云端服务器******************************************************************/
 //#define dlurl "http://download.yuanshen.site/test/"
 //#define dlurlMap "http://download.yuanshen.site/test/Map/"
+/*2.1BUG专版**********************************************************************/
+//#define dlurl "http://download.yuanshen.site/Old/2.1/"
+//#define dlurlMap "http://download.yuanshen.site/Old/2.1/Map/"
 /*临时目录子目录********************************************************************/
 #define updaterTempDir "/yuanshendt/Updater/"
 /*窗口默认值***********************************************************************/
@@ -20,7 +23,7 @@
 "%temp%\\yuanshendt\\Updater\\log\\\r\n"\
 "添加群228382171\r\n"\
 "将文件发给SanMeb\r\n\r\n"\
-"另交流群群号参见\r\n"\
+"另 交流群群号参见\r\n"\
 "https://yuanshen.site/docs/communication-group.html\r\n"\
 "谢谢!\r\n\r\n"\
 "之后还请使用安装包或压缩包安装\r\n"\

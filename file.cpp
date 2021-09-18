@@ -84,8 +84,8 @@ bool createFolderSlot(QString path)
 /*释放资源文件到目录*/
 void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName)
 {
-    QString resFile;
-    resFile=":/"+resProfiex+"/"+resFileName;
+    //:/CRT/Resource/crt/curl-ca-bundle.crt
+    QString resFile=":/"+resProfiex+"/"+resFileName;
     QFileInfo info(destFullPathFileName);
     createFolderSlot(info.path());
     QFile::copy(resFile,destFullPathFileName);
@@ -177,12 +177,11 @@ bool moveFile(QString oldPath,QString newPath)
     if(ofile.isOpen())
     {
         qDebug()<<"文件占用?.?";
-        return(-1);
+        return(false);
 
     }else{
 
         qDebug()<<"尝试移动文件";
-        //re = false;
         re = QFile::rename(oldPath,newPath);
         if(!re)
         {
@@ -195,11 +194,24 @@ bool moveFile(QString oldPath,QString newPath)
                         newPath.replace("/","\\").toLocal8Bit().constData()
                         );
             qDebug()<<"FILE * E:"<<reint<<GetLastError();
-            if(reint==0)re=true;
+            if(reint==0)
+            {
+                re=true;
+            }else{
+                qDebug()<<"winAPI救我";//救不了
+                int rewinbool=DeleteFileW((LPCWSTR)newPath.replace("/","\\").unicode());
+                qDebug()<<"FILE * R:"<<rewinbool<<GetLastError();
+                reint = rename(
+                            oldPath.replace("/","\\").toLocal8Bit().constData(),
+                            newPath.replace("/","\\").toLocal8Bit().constData()
+                            );
+                qDebug()<<"FILE * E:"<<reint<<GetLastError();
+                if(reint==0)re=true;
+            }
         }
-        return re;
-    }
 
+    }
+    return re;
 }
 QString dp0()
 {

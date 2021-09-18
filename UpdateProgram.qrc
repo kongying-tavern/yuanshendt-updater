@@ -13,4 +13,5 @@
     <qresource prefix="/CRT">
         <file>Resource/crt/curl-ca-bundle.crt</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>
