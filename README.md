@@ -23,4 +23,4 @@
 
 另 更新失败请手动删除整个地图后全新下载
     （有个bug我没法复现，大力出奇迹!
-    [ ](https://images.gitee.com/uploads/images/2021/0918/222959_86be40cd_5685289.gif "E3H(K8E`4Q9O(UE}XC(@_ND.gif")
+    ![ ](https://images.gitee.com/uploads/images/2021/0918/223235_38d6c358_5685289.gif "E3H(K8E`4Q9O(UE}XC(@_ND.gif")
