@@ -5,8 +5,10 @@
 #include <QProcess>
 #include <QDir>
 #include <QFile>
-
 #include <QCoreApplication>
+
+
+
 #include "Start.h"
 #include "Sandefine.h"
 using namespace std;
@@ -168,16 +170,51 @@ bool moveFile(QString oldPath,QString newPath)
     qDebug()<<"newPath:"<<newPath;
     bool re;
     QFile nfile(newPath);
+    LPVOID   lpMsgBuf;
+    DWORD lastError=GetLastError ();
+    FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER   |
+                FORMAT_MESSAGE_FROM_SYSTEM   |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                lastError,
+                MAKELANGID(LANG_NEUTRAL,   SUBLANG_DEFAULT),   //   Default   language
+                (LPTSTR)   &lpMsgBuf,
+                0,
+                NULL
+                );
 
-    if(nfile.exists())
+    if(nfile.exists())//删除目标文件
     {
-        if(!nfile.remove())qDebug()<<"removeFile X";
+        qDebug()<<"删除目标文件";
+        int err;
+        SetLastError(err);
+
+        if(!nfile.remove())
+        {
+            err=GetLastError();
+            qDebug()<<"QFile::remove fail"<<errcode2str(err);
+            SetLastError(err);
+            if(remove(newPath.replace("/","\\").toLocal8Bit().constData())==-1)
+            {
+                err=GetLastError();
+                qDebug()<<"std::remove fail"<<errcode2str(err);
+                SetLastError(err);
+                if(DeleteFileW((LPCWSTR)newPath.replace("/","\\").unicode())==0)
+                {
+                    err=GetLastError();
+                    qDebug()<<"winAPI remove fail"<<errcode2str(err);
+                    SetLastError(err);
+                    return false;
+                }
+            }
+        }
     }
     QFile ofile(oldPath);
     if(ofile.isOpen())
     {
         qDebug()<<"文件占用?.?";
-        return(false);
+        return false;
 
     }else{
 
@@ -187,8 +224,6 @@ bool moveFile(QString oldPath,QString newPath)
         {
             qDebug()<<"?";
             int reint;
-            reint=remove(newPath.replace("/","\\").toLocal8Bit().constData());
-            qDebug()<<"FILE * R:"<<reint<<GetLastError();
             reint = rename(
                         oldPath.replace("/","\\").toLocal8Bit().constData(),
                         newPath.replace("/","\\").toLocal8Bit().constData()
@@ -197,19 +232,8 @@ bool moveFile(QString oldPath,QString newPath)
             if(reint==0)
             {
                 re=true;
-            }else{
-                qDebug()<<"winAPI救我";//救不了
-                int rewinbool=DeleteFileW((LPCWSTR)newPath.replace("/","\\").unicode());
-                qDebug()<<"FILE * R:"<<rewinbool<<GetLastError();
-                reint = rename(
-                            oldPath.replace("/","\\").toLocal8Bit().constData(),
-                            newPath.replace("/","\\").toLocal8Bit().constData()
-                            );
-                qDebug()<<"FILE * E:"<<reint<<GetLastError();
-                if(reint==0)re=true;
             }
         }
-
     }
     return re;
 }

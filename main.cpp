@@ -1,10 +1,6 @@
 ﻿#include <QApplication>
-#include "HTTP.cpp"
-#include "MD5.cpp"
-#include "file.cpp"
 #include <QDebug>
 #include <QString>
-#include "Sandefine.h"
 #include <QCoreApplication>
 #include <QFile>
 #include <QDateTime>
@@ -16,7 +12,10 @@
 #include <iostream>
 #include <io.h>
 #include <string>
-
+#include "HTTP.cpp"
+#include "MD5.cpp"
+#include "file.cpp"
+#include "Sandefine.h"
 void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 
@@ -70,7 +69,7 @@ void cleanLog()
 {
     QStringList fList;
     file_search(logPath,fList);
-    for(int i=0;i<fList.size()-3;++i)//保留4个//暂且能按时间来
+    for(int i=0;i<fList.size()-3;i++)//保留3个//暂且能按时间来
     {
         qDebug()<<"删除旧日志:"<<fList.at(i);
         QFile(fList.at(i)).remove();
@@ -91,6 +90,7 @@ int main(int argc, char *argv[])
     //qDebug()<<"工作路径"<<QString(plwordPath);
     QString tem="";
     //qDebug()<<argc;
+    //传参时路径最后必须加反斜杠,头尾加双引号
     for(int i = 1; i< argc;++i)
     {
         if(i<2)

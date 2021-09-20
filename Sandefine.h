@@ -1,4 +1,4 @@
-﻿#ifndef SANDEFINE_H
+#ifndef SANDEFINE_H
 #define SANDEFINE_H
 #include <QString>
 /*云端服务器***********************************************************************/
@@ -34,5 +34,13 @@
 static QString logPath;
 static QString logfile;
 
-#endif // SANDEFINE_H
+QString errcode2str(int errcode);
 
+
+class Sandefine
+{
+public:
+    Sandefine();
+};
+
+#endif // SANDEFINE_H
