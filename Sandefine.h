@@ -35,7 +35,7 @@ static QString logPath;
 static QString logfile;
 
 QString errcode2str(int errcode);
-
+QString curlerr2str(int errcode);
 
 class Sandefine
 {

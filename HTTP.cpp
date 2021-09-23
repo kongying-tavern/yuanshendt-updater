@@ -124,12 +124,21 @@ int HTTP::httpDownLoad(QString URL,QString Path)
             emit dldone();
         }else{
             qDebug()<<&tid<<"下载文件错误"<<curlreint;
-            emit tworkMessageBox(1,"下载文件","错误:"+QString::number(curlreint)+"\r\n"+Path);
+            emit tworkMessageBox(1
+                                 ,"下载文件"
+                                 ,"错误:"+QString::number(curlreint)
+                                   +"\r\n"+Path
+                                   +"\r\n"+curlerr2str(curlreint)
+                                 );
         }
         if(reint!=0){
             qDebug()<<&tid<<"closeflie?.?"<<reint;
             qDebug()<<&tid<<"关闭文件时错误"<<reint;
-            emit tworkMessageBox(1,"关闭文件","错误:"+QString::number(reint)+"\r\n"+Path);
+            emit tworkMessageBox(1
+                                 ,"关闭文件"
+                                 ,"错误:"+QString::number(reint)
+                                    +"\r\n"+Path
+                                 );
         }
     }
     curl_easy_cleanup(handle);

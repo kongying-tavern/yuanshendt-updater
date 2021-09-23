@@ -169,21 +169,8 @@ bool moveFile(QString oldPath,QString newPath)
     qDebug()<<"oldPath:"<<oldPath;
     qDebug()<<"newPath:"<<newPath;
     bool re;
-    QFile nfile(newPath);
-    LPVOID   lpMsgBuf;
-    DWORD lastError=GetLastError ();
-    FormatMessage(
-                FORMAT_MESSAGE_ALLOCATE_BUFFER   |
-                FORMAT_MESSAGE_FROM_SYSTEM   |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                lastError,
-                MAKELANGID(LANG_NEUTRAL,   SUBLANG_DEFAULT),   //   Default   language
-                (LPTSTR)   &lpMsgBuf,
-                0,
-                NULL
-                );
 
+    QFile nfile(newPath);
     if(nfile.exists())//删除目标文件
     {
         qDebug()<<"删除目标文件";
@@ -224,11 +211,12 @@ bool moveFile(QString oldPath,QString newPath)
         {
             qDebug()<<"?";
             int reint;
+            int err=GetLastError();
             reint = rename(
                         oldPath.replace("/","\\").toLocal8Bit().constData(),
                         newPath.replace("/","\\").toLocal8Bit().constData()
                         );
-            qDebug()<<"FILE * E:"<<reint<<GetLastError();
+            qDebug()<<"std::rename"<<reint<<errcode2str(err);
             if(reint==0)
             {
                 re=true;
