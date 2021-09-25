@@ -173,8 +173,32 @@ bool moveFile(QString oldPath,QString newPath)
     QFile nfile(newPath);
     if(nfile.exists())//删除目标文件
     {
-        qDebug()<<"删除目标文件";
         int err;
+        qDebug()<<"删除目标文件";
+        DWORD FileAttributes=GetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode());
+        if(FileAttributes)
+        {
+//            if (FileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+//            {
+//                printf("Archive ");
+//            }
+//            if (FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+//            {
+//                printf("Directory ");
+//            }
+            if (FileAttributes & FILE_ATTRIBUTE_READONLY)
+            {
+                qDebug()<<"文件为只读";
+                SetLastError(err);
+                SetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode(),FILE_ATTRIBUTE_NORMAL);
+                err=GetLastError();
+                qDebug()<<"SetFileAttributesW"<<errcode2str(err);
+            }
+        }else{
+
+            //return false;//暂时不return;
+        }
+
         SetLastError(err);
 
         if(!nfile.remove())
