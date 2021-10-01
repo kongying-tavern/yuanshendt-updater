@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     logfile=logPath+QString::number(QDateTime::currentDateTime().toUTC().toMSecsSinceEpoch());
     qInstallMessageHandler(MessageOutput);//启动日志
     cleanLog();//清理旧日志
-
+    qDebug()<<"v1.1.10";
 
     //qDebug()<<"工作路径"<<QString(plwordPath);
     QString tem="";
@@ -102,12 +102,11 @@ int main(int argc, char *argv[])
     }
     if(tem.indexOf("?")>0)//唉
     {
+        qDebug()<<"宽字符传参";
         LPWSTR s=GetCommandLineW();
         LPWSTR *cmdLineAry=CommandLineToArgvW(s,&argc);
-
         for(int i = 1; i< argc;++i)
         {
-            //qDebug()<<QString::fromStdWString(cmdLineAry[i]);
             if(i<2)
             {
                 tem =QString::fromStdWString(cmdLineAry[i]);

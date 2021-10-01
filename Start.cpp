@@ -15,7 +15,7 @@
 #include "Json.h"
 #include "mainwindow.h"
 
-
+Start *tp;
 Start::Start(QString dir, QObject *parent)
     : QObject(parent)
 {
@@ -23,9 +23,11 @@ Start::Start(QString dir, QObject *parent)
     http = new HTTP("","",NULL);//单线程下载
     connect(this, &Start::tstart, this, &Start::work);
     connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
+    tp=this;
     //connect(http, &HTTP::dldone, this, &Start::dldone);
     //thisInstance = this;
     workProcess = new QThread;
+
     moveToThread(workProcess);
     workProcess->start();
     this->dir = dir;
@@ -71,7 +73,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             netspeed[i].hisDlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=0;
             netspeed[i].path=path;
-
+            Start::stlog(moduleHTTP,"new dl"+path,tid);
             break;
         }
         if(netspeed[i].tid==tid)
@@ -83,6 +85,10 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             break;
         }
     }
+}
+void Start::stlog(int module,QString str,void* mod)
+{
+    if(tp) emit tp->log(moduleHTTP,str,mod);
 }
 void Start::dldone()
 {
@@ -261,8 +267,6 @@ void Start::work()
              //构造下载链接
              QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
              QString dlpath="Map/"+QString(needUpdate.at(i));
-             //qDebug()<<"downloadurl :"<<url;
-             //qDebug()<<"downloadpath:"<<dlpath;
 
              thttp = new HTTP(url,dlpath,this);
              connect(thttp,&HTTP::dldone
@@ -274,6 +278,7 @@ void Start::work()
                      ,Qt::DirectConnection
                      );
              tpoolhttp->start(thttp);
+
          }else{
              qDebug()<<needUpdate.at(i)<<"已下载";
              Start::dldone();
@@ -282,6 +287,7 @@ void Start::work()
      }
 
      //tpoolhttp->activeThreadCount();
+     tpoolhttp->dumpObjectTree();
      tpoolhttp->waitForDone(-1);
      tpoolhttp->clear();
      qDebug()<<"下载完成";
@@ -313,8 +319,7 @@ void Start::work()
                 "/"+
                 QString(needUpdate.at(i))
                 ;
-        //qDebug()<<"oldPath:"<<oldPath;
-        //qDebug()<<"newPath:"<<newPath;
+
         qDebug()<<QString::number(i+1)+
                   "|"+
                   QString::number(needUpdate.size())
@@ -342,8 +347,6 @@ void Start::work()
                 Start::updaterErr();
                 return;
             }
-
-            //QMessageBox::warning(NULL,"不对劲","尝试移动\n"+needUpdate.at(i)+"\n的时候遇到了蹦蹦炸弹都解决不了的问题");
         }
         emit tworkProcess(i,needUpdate.size());
     }

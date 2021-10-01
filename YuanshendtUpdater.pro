@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 RC_FILE += my.rc
 CONFIG += c++11
 #日志窗口
-#CONFIG +=console
+CONFIG +=console
 #日志输出
 DEFINES += QT_MESSAGELOGCONTEXT
 # The following define makes your compiler emit warnings if you use
@@ -31,6 +31,7 @@ SOURCES += \
     Sandefine.cpp \
     Start.cpp \
     file.cpp \
+    logviewer.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -41,10 +42,12 @@ HEADERS += \
     Sandefine.h \
     Start.h \
     file.h \
+    logviewer.h \
     mainwindow.h \
     my.rc
 
 FORMS += \
+    logviewer.ui \
     mainwindow.ui
 
 TRANSLATIONS += \
@@ -68,6 +71,7 @@ DISTFILES += \
 #引用外部库
 TEMPLATE = app
 LIBS+= $$PWD"/curllib/libcurl-x64.dll"
+
 
 win32: LIBS += -L$$PWD/curllib/ -lcurl
 INCLUDEPATH += $$PWD/curllib

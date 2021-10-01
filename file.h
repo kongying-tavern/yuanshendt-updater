@@ -1,4 +1,4 @@
-#ifndef FILE_H
+﻿#ifndef FILE_H
 #define FILE_H
 #include<iostream>
 #include<string>
@@ -19,26 +19,22 @@ void file_search(QString path,
                  );
 
 QString getTempPath(char* path);
-
 bool createFolderSlot(QString path);
-
 void saveResourecFile(QString resProfiex,
                       QString resFileName,
                       QString destFullPathFileName
                       );
-
 QString readTXT(QString Path);
-
 QStringList getUptater(QStringList localFilePath,
                        QStringList localFileMD5,
                        QStringList newFilePath,
                        QStringList newFileMD5,
                        QString lworkPath
                        );
-
 bool moveFile(QString oldPath,
               QString newPath
               );
+bool fileIsOpen(QString filePath);
 
 QString dp0();
 #endif // FILE_H

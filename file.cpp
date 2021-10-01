@@ -7,7 +7,10 @@
 #include <QFile>
 #include <QCoreApplication>
 
-
+#include <RestartManager.h>
+#include <winbase.h>
+#include <psapi.h>
+#include <stdio.h>
 
 #include "Start.h"
 #include "Sandefine.h"
@@ -178,29 +181,20 @@ bool moveFile(QString oldPath,QString newPath)
         DWORD FileAttributes=GetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode());
         if(FileAttributes)
         {
-//            if (FileAttributes & FILE_ATTRIBUTE_ARCHIVE)
-//            {
-//                printf("Archive ");
-//            }
-//            if (FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-//            {
-//                printf("Directory ");
-//            }
             if (FileAttributes & FILE_ATTRIBUTE_READONLY)
             {
                 qDebug()<<"文件为只读";
                 SetLastError(err);
-                SetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode(),FILE_ATTRIBUTE_NORMAL);
+                SetFileAttributesW(
+                            (LPCWSTR)newPath.replace("/","\\").unicode()
+                            ,FILE_ATTRIBUTE_NORMAL
+                            );
                 err=GetLastError();
                 qDebug()<<"SetFileAttributesW"<<errcode2str(err);
             }
-        }else{
-
-            //return false;//暂时不return;
         }
 
         SetLastError(err);
-
         if(!nfile.remove())
         {
             err=GetLastError();
@@ -233,7 +227,7 @@ bool moveFile(QString oldPath,QString newPath)
         re = QFile::rename(oldPath,newPath);
         if(!re)
         {
-            qDebug()<<"?";
+            qDebug()<<"宽字符方法";
             int reint;
             int err=GetLastError();
             reint = rename(
@@ -249,6 +243,11 @@ bool moveFile(QString oldPath,QString newPath)
     }
     return re;
 }
+bool fileIsOpen(QString filePath)
+{
+
+}
+
 QString dp0()
 {
     return QCoreApplication::applicationDirPath();

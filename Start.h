@@ -44,6 +44,7 @@ public:
 public:
     static Start *thisInstance;
     static void dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path);
+    static void stlog(int module,QString str,void* mod);
 private:
 
     QThread *workProcess = nullptr;
@@ -61,6 +62,7 @@ public slots:
 
 signals:
     void tstart();
+    void log(int module,QString str,void* mod);
 signals:
     //void tworkError(int errorCode);
     void tworkProcess(int a,int b);

@@ -14,6 +14,8 @@
 #include <Start.h>
 QT_BEGIN_NAMESPACE
 #include <iostream>
+
+#include "logviewer.h"
 using namespace std;
 
 namespace Ui
@@ -36,16 +38,20 @@ protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
+    void showEvent(QShowEvent *event);
 private slots:
     void on_pushButton_Start_clicked();
     void on_pushButton_Exit_clicked();
     //多线程窗口更新
     void Work_Process(int a,int b);
     void Work_Finished(bool done);
-    //停止Strat线程
+
 signals:
     void stopTwork();
+    void moveLogViewer(QPoint e,QPoint mainPoint);
 public:
+    logViewer *logUI;
+    /*窗口托管*/
     static MainWindow *mutualUi;
     /*窗口控制托管sub*/
     void changeMainPage(int page,bool done=false);/*修改MainPage,0:进度条 1:选择目录按钮*/
@@ -64,15 +70,17 @@ public:
 
 
 private:
+
     int boundaryWidth;
-        QPoint clickPos;
-        Start *ttstart=nullptr;
-        HTTP *http=nullptr;
+    QPoint clickPos;
+    Start *ttstart=nullptr;
+    HTTP *http=nullptr;
     Ui::MainWindow *ui;
     /*timerEvent*/
     void timerEvent(QTimerEvent *event);
     int timer1;
-    /*多线程传参*/
+
+
 
 };
 

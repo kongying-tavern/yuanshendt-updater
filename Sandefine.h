@@ -30,6 +30,15 @@
 "↓下载地址↓若显示两行还请复制完整\r\n\r\n"\
 "http://download.yuanshen.site/%e7%a9%ba%e8%8d%a7%e9%85%92%e9%a6%86%e5%9c%b0%e5%9b%be%e5%ae%a2%e6%88%b7%e7%ab%af"
 
+/*moduleCode********************************************/
+#define modulemainWindows 0
+#define moduleStart 1
+#define moduleHTTP 2
+#define modulefile 3
+#define moduleMD5 4
+#define moduleJson 5
+
+
 
 static QString logPath;
 static QString logfile;

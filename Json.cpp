@@ -1,10 +1,15 @@
 #include "Json.h"
 #include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <iostream>
 
+#include <iostream>
+JSON::JSON(QWidget *parent)
+{
+
+}
+JSON::~JSON()
+{
+
+}
 void jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
 {
 

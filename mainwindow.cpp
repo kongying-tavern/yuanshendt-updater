@@ -6,10 +6,10 @@
 #include <QProcess>
 #include <QPropertyAnimation>
 
-#include "qstring.h"
+
 #include <shlwapi.h>
 #include "Sandefine.h"
-
+#include "logviewer.h"
 #include <HTTP.h>
 
 
@@ -18,6 +18,7 @@ bool updaterIsRunning;
 bool alldone=false;
 QString workPath;
 MainWindow *MainWindow::mutualUi = nullptr;/*托管初始化，非常重要*/
+
 MainWindow::MainWindow(QWidget *parent, QString pathStr)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -27,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     //qDebug()<<(pathStr);
     ui->setupUi(this);
     mutualUi = this;//托管初始化，非常重要
+
     this->setWindowFlag(Qt::FramelessWindowHint); // 无边框窗口
     setAttribute(Qt::WA_TranslucentBackground, true);  // 背景透明
 
@@ -38,6 +40,13 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     shadow->setBlurRadius(15);//设定阴影的模糊半径，数值越大越模糊
     ui->label_Shadow->setGraphicsEffect(shadow);
 
+    /*初始化装逼窗口*/
+    //logViewer *logUI(new logViewer);
+    logUI = new logViewer(this);
+    logUI->setModal(false);
+    logUI->show();
+    connect(this, &MainWindow::moveLogViewer
+            ,logUI, &logViewer::moveLogViewer);
 
     if(pathStr == nullptr)
     {
@@ -49,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
         qDebug()<<"workPath:"<<workPath;
         threadWork(workPath);
     }
+
 }
 MainWindow::~MainWindow()
 {
@@ -116,19 +126,21 @@ void MainWindow::mousePressEvent(QMouseEvent *e)  // 鼠标按下触发记录当
     if(e->button()==Qt::LeftButton)
     {
         clickPos=e->pos();
-        //qDebug()<<this->pos();
         //qDebug()<<e->pos();
         windowsMoveOn=true;
     }
 }
 void MainWindow::mouseMoveEvent(QMouseEvent *e)  // 移动窗口(根据windowsMoveOn)
-{    
-    if(windowsMoveOn){
-        //qDebug()<<e;
+{        
+    if(windowsMoveOn)
+    {
         move(this->pos()+e->pos()-clickPos);
-        //clickPos=this->pos();
-
+        emit moveLogViewer(this->pos(),QPoint(this->width(),0));
     }
+}
+void MainWindow::showEvent(QShowEvent *event)
+{
+    emit moveLogViewer(this->pos(),QPoint(this->width(),0));
 }
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)//鼠标任何按键松开
 {
@@ -143,6 +155,7 @@ void MainWindow::on_pushButton_Exit_clicked()//关闭按钮被单击
     {
         ttstart->stopWork();
     }
+    logUI->close();
     QApplication* app;
     app->exit(0);
 }
@@ -221,6 +234,7 @@ void MainWindow::startThread(QString path)
         }
     //创建多线程工作对象
     ttstart = new Start(path, NULL);
+
     //连接工作触发信号
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
     connect(ttstart, &Start::tworkProcess
@@ -230,7 +244,9 @@ void MainWindow::startThread(QString path)
     connect(ttstart, &Start::tworkMessageBox
             ,this, &MainWindow::Work_MessageBox);
     //connect(this,&MainWindow::stopTwork,ttstart,&Start::stopWork,Qt::DirectConnection);
-
+    //日志窗口信号
+    connect(ttstart,&Start::log
+            ,logUI,&logViewer::log);
     //开始工作
     timer1 = startTimer(500);//0.5s定时器
     emit ttstart->tstart();
