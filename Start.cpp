@@ -48,6 +48,10 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         if( netspeed[i].isdling==true && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
         {
             qDebug()<<&netspeed[i].tid<<"end dl"<<netspeed[i].path;
+            Start::stlog(moduleHTTP,
+                         "end dl "+netspeed[i].path,
+                         (qint64)netspeed[i].tid
+                         );
             netspeed[i].isdling=false;
             netspeed[i].tid=NULL;
             //netspeed[i].dl=0;
@@ -73,7 +77,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             netspeed[i].hisDlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=0;
             netspeed[i].path=path;
-            Start::stlog(moduleHTTP,"new dl"+path,tid);
+            Start::stlog(moduleHTTP,"new dl "+path,(qint64)tid);
             break;
         }
         if(netspeed[i].tid==tid)
@@ -86,7 +90,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         }
     }
 }
-void Start::stlog(int module,QString str,void* mod)
+void Start::stlog(int module,QString str,int mod)
 {
     if(tp) emit tp->log(moduleHTTP,str,mod);
 }
@@ -226,12 +230,14 @@ void Start::work()
     QStringList needUpdate;
     QStringList needUpdateMD5;
     qDebug()<<"按需读取本地文件MD5:"<<path;
-
+    QString omd5;
     for(int i = 0; i< newFileList.size();++i)
     {
         //qDebug()<<newFileMD5.at(i)<<this->dir+"/"+newFileList.at(i);
+        omd5 = getFlieMD5(this->dir+"/"+newFileList.at(i));
+        emit log(moduleMD5,"本地文件MD5:"+omd5+"|"+newFileList.at(i),NULL);
         emit tworkProcess(i,newFileList.size());
-        if(newFileMD5.at(i) != getFlieMD5(this->dir+"/"+newFileList.at(i)))
+        if(newFileMD5.at(i) != omd5)
         {
             MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
             qDebug()<<"MD5不匹配:"<<dir+"/"+newFileList.at(i);
