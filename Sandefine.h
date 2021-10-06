@@ -1,4 +1,4 @@
-#ifndef SANDEFINE_H
+﻿#ifndef SANDEFINE_H
 #define SANDEFINE_H
 #include <QString>
 /*云端服务器***********************************************************************/
@@ -39,9 +39,9 @@
 #define moduleJson 5
 
 
-
 static QString logPath;
 static QString logfile;
+static QString dpnx0;
 
 QString errcode2str(int errcode);
 QString curlerr2str(int errcode);

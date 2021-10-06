@@ -67,9 +67,9 @@ void file_search(QString path,QStringList &fileList)//已弃用
 }
 
 /*获取环境变量temp*/
-QString getTempPath(char* path)
+QString getTempPath(QString path)
 {
-    return QProcessEnvironment::systemEnvironment().value(QString(path)).replace("\\","/");
+    return QProcessEnvironment::systemEnvironment().value(path).replace("\\","/");
 }
 /*创建文件夹*/
 bool createFolderSlot(QString path)
@@ -89,7 +89,7 @@ bool createFolderSlot(QString path)
 /*释放资源文件到目录*/
 void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName)
 {
-    //:/CRT/Resource/crt/curl-ca-bundle.crt
+    //     :/CRT/Resource/crt/curl-ca-bundle.crt
     QString resFile=":/"+resProfiex+"/"+resFileName;
     QFileInfo info(destFullPathFileName);
     createFolderSlot(info.path());

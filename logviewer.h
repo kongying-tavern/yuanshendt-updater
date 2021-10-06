@@ -34,22 +34,26 @@ public:
     explicit logViewer(QWidget *parent = nullptr);
     ~logViewer();
 
-    vector<QLabel*> logLabel;
+    vector<QTextEdit*> logTextEdit;
     vector<QJsonArray*> logJson;
     vector<logHTTP*> stlogHTTP;
+
 public slots:
     void moveLogViewer(QPoint e,QPoint mainPoint);
     void log(int module,QString str,int mod);
+
 private slots:
     void resizeEvent(QResizeEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     void showEvent(QShowEvent *event);
+
 private:
     Ui::logViewer *ui;
-    void logUpdate();
+    void logUpdate(int c);
 
     /*显示控制*/
-    void chooseLabel(int num);
+    int editNowChoose=1;
+    void chooseEdit(int num);
 
 
 };

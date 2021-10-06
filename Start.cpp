@@ -41,7 +41,7 @@ Start::~Start()
 
 void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
 {
-    for(int i=0;i<3;++i)
+    for(int i=0;i<maxDlThreah;++i)
     {
         //清理已完成的任务
         //if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
@@ -58,7 +58,6 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             //netspeed[i].hisDl=0;
             //netspeed[i].total=0;
             //netspeed[i].path="";
-            //emit dldone();//会被重复调用几次,不能放这
             MainWindow::mutualUi->updataDlingmag();//更新进度文本
         }
     }
@@ -92,7 +91,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
 }
 void Start::stlog(int module,QString str,int mod)
 {
-    if(tp) emit tp->log(moduleHTTP,str,mod);
+    if(tp) emit tp->log(module,str,mod);
 }
 void Start::dldone()
 {
@@ -235,15 +234,21 @@ void Start::work()
     {
         //qDebug()<<newFileMD5.at(i)<<this->dir+"/"+newFileList.at(i);
         omd5 = getFlieMD5(this->dir+"/"+newFileList.at(i));
-        emit log(moduleMD5,"本地文件MD5:"+omd5+"|"+newFileList.at(i),NULL);
+        //emit log(moduleMD5,"本地文件MD5:"+omd5+"|"+newFileList.at(i),NULL);
+        emit log(moduleMD5,"本地文件:\t"+newFileList.at(i),NULL);
+        emit log(moduleMD5,"本地MD5:\t"+omd5,NULL);
         emit tworkProcess(i,newFileList.size());
-        if(newFileMD5.at(i) != omd5)
+        MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
+        if(newFileMD5.at(i) == omd5)
         {
-            MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
+            emit log(moduleMD5,"云端MD5\t"+newFileMD5.at(i),NULL);
+        }else{
             qDebug()<<"MD5不匹配:"<<dir+"/"+newFileList.at(i);
+            emit log(moduleMD5,"云端MD5\t"+newFileMD5.at(i)+"\t需要更新",NULL);
             needUpdate<<newFileList.at(i);
             needUpdateMD5<<newFileMD5.at(i);
         }
+        emit log(moduleMD5,"\r\n",NULL);
     }
     //return;
 
@@ -262,7 +267,7 @@ void Start::work()
      doneFile=0;
      //初始libcurl线程池
      tpoolhttp=QThreadPool::globalInstance();
-     tpoolhttp->setMaxThreadCount(3);
+     tpoolhttp->setMaxThreadCount(maxDlThreah);
      tpoolhttp->setExpiryTimeout(-1);
 
      for(int i = 0; i< needUpdate.size();++i)

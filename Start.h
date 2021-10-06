@@ -13,6 +13,8 @@
 #include <string>
 
 #include "HTTP.h"
+
+#define maxDlThreah 3
 using namespace std;
 static QString threadWorking;
 
@@ -27,7 +29,7 @@ struct stnetspeed
     void *tid;
     QString path;
 };
-static stnetspeed netspeed[3];
+static stnetspeed netspeed[maxDlThreah];
 static int totalFile;
 static int doneFile;
 class Start : public QObject
@@ -42,7 +44,7 @@ public:
     void relaytworkMessageBox(int tag,QString title,QString txt);
     void stopWork();
 public:
-    static Start *thisInstance;
+
     static void dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path);
     static void stlog(int module,QString str,int mod);
 private:

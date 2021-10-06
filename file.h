@@ -18,7 +18,7 @@ void file_search(QString path,
                  QStringList &fileList
                  );
 
-QString getTempPath(char* path);
+QString getTempPath(QString path);
 bool createFolderSlot(QString path);
 void saveResourecFile(QString resProfiex,
                       QString resFileName,

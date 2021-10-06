@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
             +updaterTempDir
             +"log/";
     createFolderSlot(logPath);
-    logfile=logPath+QString::number(QDateTime::currentDateTime().toUTC().toMSecsSinceEpoch());
+    logfile=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
     qInstallMessageHandler(MessageOutput);//启动日志
     cleanLog();//清理旧日志
     qDebug()<<"v1.1.10";
@@ -90,9 +90,14 @@ int main(int argc, char *argv[])
     //qDebug()<<"工作路径"<<QString(plwordPath);
     QString tem="";
     //qDebug()<<argc;
-    //传参时路径最后必须加反斜杠,头尾加双引号
+    //qDebug()<<argv[0];
+    dpnx0=argv[0];
+    //qDebug()<<dpnx0;
+
+    //传参时路径最后必须加反斜杠,头尾加双引号//很重要！
     for(int i = 1; i< argc;++i)
     {
+        //qDebug()<<i<<argv[i];
         if(i<2)
         {
             tem =QString::fromLocal8Bit(argv[i]);
@@ -115,7 +120,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
     qDebug()<<"传参路径："<<tem;
     QApplication a(argc, argv);
     MainWindow w(NULL,tem);

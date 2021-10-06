@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QTextDocument>
 #include <QEvent>
+#include <QPropertyAnimation>
 
 #include "Sandefine.h"
 
@@ -21,19 +22,18 @@ logViewer::logViewer(QWidget *parent) :
     ui->setupUi(this);
     for(int i=0;i<=5;i++)//初始化
     {
-        logLabel.push_back(new QLabel(this));
+        logTextEdit.push_back(new QTextEdit(this));
         logJson.push_back(new QJsonArray);
     }
     rectangle.w=(int)(this->width()/6);
-    for(int i=0;i<logLabel.size();++i)
+    for(int i=0;i<logTextEdit.size();++i)
     {
-        logLabel[i]->setStyleSheet("border:1px solid red;");//1像素红色边框
-        logLabel[i]->setWordWrap(true);//自动折行
-        logLabel[i]->setText(QString::number(i));
-        logLabel[i]->setAlignment(Qt::AlignTop);
-        logLabel[i]->installEventFilter(this);
+        logTextEdit[i]->setAlignment(Qt::AlignTop);
+        logTextEdit[i]->setReadOnly(true);
+        logTextEdit[i]->installEventFilter(this);//事件钩子
         //动态响应初始化部分由showEvent完成
     }
+
 }
 
 logViewer::~logViewer()
@@ -50,104 +50,92 @@ void logViewer::log(int module,QString str,int mod=NULL)
     {
     case moduleHTTP:
     {
-        bool addnew=true;
+
         if(stlogHTTP.size()==0)
         {
             stlogHTTP.push_back(new logHTTP);
         }
         for(int i=0;i<stlogHTTP.size();++i)
         {
-            if(stlogHTTP[i]->tid==0)stlogHTTP[i]->tid=mod;
-
+            if(stlogHTTP[i]->tid==0)
+            {
+                stlogHTTP[i]->tid=mod;
+            }
             if(stlogHTTP[i]->tid==mod)
             {
                 stlogHTTP[i]->log<<str;
-                addnew = false;
                 break;
             }
-            qDebug()<<i<<stlogHTTP.size();
-            if(i+1==stlogHTTP.size() && addnew)
+            if(i+1==stlogHTTP.size())
             {
                 stlogHTTP.push_back(new logHTTP);
                 this->log(module,str,mod);
             }
         }
-        break;
-    }
-    case moduleStart:
 
-        break;
-    case modulefile:
-
-        break;
-    case modulemainWindows:
-
-        break;
-    case moduleJson:
-
-        break;
-    case moduleMD5:
-    {
-    QJsonObject lh;
-    lh.insert("log",str);
-    logJson[moduleMD5]->append(lh);
     }
         break;
     default:
+    {
+        QJsonObject lh;
+        lh.insert("log",str);
+        logJson[module]->append(lh);
+    }
         break;
     }
-    this->logUpdate();
+    this->logUpdate(module);
 }
-void logViewer::logUpdate()
+void logViewer::logUpdate(int c)
 {
-    QJsonDocument logstr;
-    for(int i=0;i<logLabel.size();++i)
+    QString tem;
+    switch (c)
     {
-        switch (i)
+    case moduleHTTP:
+    {
+
+        for(int y=0;y<stlogHTTP.size();++y)
         {
-        case moduleHTTP:
-        {
-            QString  tem;
-            for(int y=0;y<stlogHTTP.size();++y)
+            for(int j=0;j<stlogHTTP[y]->log.size();++j)
             {
-                for(int j=0;j<stlogHTTP[y]->log.size();++j)
-                {
-                    //qDebug()<<"tid"<<stlogHTTP[y]->tid<<QString::number(stlogHTTP[y]->tid,10)<<QString::number(stlogHTTP[y]->tid,16);
-                    tem.append("tid:");
-                    tem.append(QString::number(stlogHTTP[y]->tid));
-                    tem.append(" log:");
-                    tem.append(stlogHTTP[y]->log.at(j));
-                    tem.append("\r\n");
-                }
-                tem.append("---\r\n");
+                tem.append("tid:");
+                tem.append(QString::number(stlogHTTP[y]->tid));
+                tem.append(" log:");
+                tem.append(stlogHTTP[y]->log.at(j));
+                tem.append("\r\n");
             }
-            logLabel[i]->setText(tem);
+            tem.append("---\r\n");
         }
-            break;
-        default:
-            logstr.setArray(*logJson[i]);
-            logLabel[i]->setText(QString::fromUtf8(logstr.toJson(QJsonDocument::Compact).constData()));
-            logLabel[i]->adjustSize();
-        }
+        logTextEdit[moduleHTTP]->setText(tem);
+    }
+        break;
+    default:
 
-
+        logTextEdit[c]->append(
+                    logJson[c]
+                    ->at(logJson[c]->size()-1)
+                    .toObject()["log"]
+                .toString()
+                );
     }
 }
 void logViewer::resizeEvent(QResizeEvent *event)
 {
     rectangle.w=(int)(event->size().width()/6);
-    this->chooseLabel(moduleHTTP);//logLabel动态响应
+    rectangle.h=this->height();
+    this->chooseEdit(editNowChoose);//logTextEdit动态响应
 }
 bool logViewer::eventFilter(QObject *obj, QEvent *event)
 {
-    for(int i=0;i<logLabel.size();++i)
+
+    //qDebug()<<obj<<event->type();
+    for(int i=0;i<logTextEdit.size();++i)
     {
-        if(obj==logLabel[i])
+        if(obj==logTextEdit[i])
         {
             if(event->type()==QEvent::Enter)
             {
-                //qDebug()<<i;
-                this->chooseLabel(i);
+                editNowChoose=i;
+                this->chooseEdit(i);
                 return true;
             }else{
                 return false;
@@ -156,36 +144,35 @@ bool logViewer::eventFilter(QObject *obj, QEvent *event)
     }
     return logViewer::eventFilter(obj, event);
 }
-void logViewer::chooseLabel(int num)
+void logViewer::chooseEdit(int num)
 {
     int sw;
     int sx;
-    for(int i=0;i<logLabel.size();++i)
+    for(int i=0;i<logTextEdit.size();++i)
     {
         if(i==0)//防止数下标错误
         {
             sx=0;
         }else{
-            sx=logLabel[i-1]->pos().x()+logLabel[i-1]->width();
+            sx=logTextEdit[i-1]->pos().x()+logTextEdit[i-1]->width();
         }
         if(i!=num)//设置动态响应的Label宽度
         {
-            sw=(int)(this->width()-rectangle.w*5)/5;
+            sw=(int)(this->width()-rectangle.w*3)/5;
         }else{
-            sw=rectangle.w*5;
+            sw=rectangle.w*3;
         }
-        //应用
-        logLabel[i]->setMinimumWidth(sw);
-        logLabel[i]->setMaximumWidth(sw);
-        logLabel[i]->setGeometry(sx
-                                 ,0
-                                 ,sw
-                                 ,logLabel[i]->geometry().height()
-                                 );
-        logLabel[i]->adjustSize();
+        //响应
+        logTextEdit[i]->setMinimumWidth(sw);
+        logTextEdit[i]->setMaximumWidth(sw);
+        logTextEdit[i]->setGeometry(sx
+                                    ,0
+                                    ,sw
+                                    ,rectangle.h
+                                    );
     }
 }
 void logViewer::showEvent(QShowEvent *event)
 {
-    this->chooseLabel(moduleHTTP);
+    this->chooseEdit(moduleHTTP);
 }
