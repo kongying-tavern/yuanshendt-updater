@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>710</width>
+    <width>952</width>
     <height>509</height>
    </rect>
   </property>
@@ -22,8 +22,8 @@
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>100</y>
+     <x>320</x>
+     <y>210</y>
      <width>256</width>
      <height>192</height>
     </rect>

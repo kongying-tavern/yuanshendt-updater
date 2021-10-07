@@ -48,10 +48,6 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         if( netspeed[i].isdling==true && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
         {
             qDebug()<<&netspeed[i].tid<<"end dl"<<netspeed[i].path;
-            Start::stlog(moduleHTTP,
-                         "end dl "+netspeed[i].path,
-                         (qint64)netspeed[i].tid
-                         );
             netspeed[i].isdling=false;
             netspeed[i].tid=NULL;
             //netspeed[i].dl=0;
@@ -76,7 +72,6 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             netspeed[i].hisDlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=0;
             netspeed[i].path=path;
-            Start::stlog(moduleHTTP,"new dl "+path,(qint64)tid);
             break;
         }
         if(netspeed[i].tid==tid)

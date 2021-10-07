@@ -29,6 +29,7 @@ HTTP::HTTP(QString URL,QString Path,QObject *parent)
 HTTP::~HTTP()
 {
     qDebug()<<&tid<<"HTTP被销毁";
+
 }
 void httpcrt()
 {
@@ -44,13 +45,16 @@ void httpcrt()
 void HTTP::run()
 {
     //qDebug()<<"HTTP run 线程ID：" << QThread::currentThread();
-    if(this->turl=="" && this->tdlpath==""){
+    if(this->turl=="" || this->tdlpath==""){
         qDebug()<<"无传参";
         return;
     }
     tid=QThread::currentThreadId();//这东西必须放在线程启动后,否则变单线程
-    qDebug()<<&tid<<"HTTP被创建";
-    qDebug()<<&tid<<"任务:"<<this->turl<<this->tdlpath;
+    qDebug()<<&tid
+           <<"HTTP线程被激活"
+           <<"任务:"
+           <<this->turl
+           <<this->tdlpath;
     HTTP::httpDownLoad(this->turl,this->tdlpath);
 }
 int HTTP::httpDownLoad(QString URL,QString Path)
@@ -116,11 +120,17 @@ int HTTP::httpDownLoad(QString URL,QString Path)
         Start::dlworking(0,0,tid,Path);//通知Start线程本线程下载的文件
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, pagefile);//数据流定向至FILE *
         qDebug()<<&tid<<"下载开始";
+        Start::stlog(moduleHTTP,"new dl "+URL,(qint64)tid);
         int curlreint=curl_easy_perform(handle);//开始下载
         reint = fclose(pagefile);
         if(curlreint == CURLE_OK)
         {
             qDebug()<<&tid<<"下载完成";
+            Start::stlog(moduleHTTP,
+                         "end dl "+
+                         URL,
+                         (qint64)tid
+                         );
             emit dldone();
         }else{
             qDebug()<<&tid<<"下载文件错误"<<curlreint;

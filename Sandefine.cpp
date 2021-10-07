@@ -1,4 +1,4 @@
-#include "Sandefine.h"
+﻿#include "Sandefine.h"
 #include <QDebug>
 
 #include <windows.h>

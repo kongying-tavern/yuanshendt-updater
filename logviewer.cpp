@@ -11,7 +11,7 @@
 #include <QPropertyAnimation>
 
 #include "Sandefine.h"
-
+#define editw 4.5
 rectangle rectangle;
 
 logViewer::logViewer(QWidget *parent) :
@@ -69,7 +69,8 @@ void logViewer::log(int module,QString str,int mod=NULL)
             if(i+1==stlogHTTP.size())
             {
                 stlogHTTP.push_back(new logHTTP);
-                this->log(module,str,mod);
+                //this->log(module,str,mod);//日
+                //push_back以后size变了会多循环一轮了日志重复添加了
             }
         }
 
@@ -84,6 +85,7 @@ void logViewer::log(int module,QString str,int mod=NULL)
         break;
     }
     this->logUpdate(module);
+
 }
 void logViewer::logUpdate(int c)
 {
@@ -158,9 +160,9 @@ void logViewer::chooseEdit(int num)
         }
         if(i!=num)//设置动态响应的Label宽度
         {
-            sw=(int)(this->width()-rectangle.w*3)/5;
+            sw=(int)(this->width()-(int)(rectangle.w*editw))/5;
         }else{
-            sw=rectangle.w*3;
+            sw=(int)(rectangle.w*editw);
         }
         //响应
         logTextEdit[i]->setMinimumWidth(sw);
