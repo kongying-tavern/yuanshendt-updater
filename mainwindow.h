@@ -39,6 +39,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void showEvent(QShowEvent *event);
+    void keyPressEvent(QKeyEvent *e);
 private slots:
     void on_pushButton_Start_clicked();
     void on_pushButton_Exit_clicked();

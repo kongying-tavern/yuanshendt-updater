@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     //logViewer *logUI(new logViewer);
     logUI = new logViewer(this);
     logUI->setModal(false);
-    logUI->show();
+    //logUI->show();
     connect(this, &MainWindow::moveLogViewer
             ,logUI, &logViewer::moveLogViewer);
 
@@ -155,11 +155,18 @@ void MainWindow::on_pushButton_Exit_clicked()//关闭按钮被单击
     {
         ttstart->stopWork();
     }
-    logUI->close();
+    if(logUI)logUI->close();
     QApplication* app;
     app->exit(0);
 }
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
 
+    if(e->key()==Qt::Key_L && e->modifiers()==Qt::ShiftModifier)
+    {
+        if(logUI)logUI->show();
+    }
+}
 
 void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_search(多线程已完成)*/
 {

@@ -84,7 +84,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
         }
     }
 }
-void Start::stlog(int module,QString str,int mod)
+void Start::stlog(int module,QString str,int mod=NULL)
 {
     if(tp) emit tp->log(module,str,mod);
 }
@@ -136,7 +136,7 @@ void Start::updaterErr()
     MainWindow::mutualUi->changeMainPage(1,false);
     emit tworkMessageBox(1,
                          "自动更新失败",
-                         uperr);
+                         uperr_new);
 }
 void Start::stopWork()
 {
@@ -215,7 +215,9 @@ void Start::work()
     //qDebug()<<tempPath<<"download/md5.json";
     newMD5Str = readTXT(tempPath+"download/md5.json");
     qDebug()<<"开始转换成QSL";
-    jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
+    JSON *json=new JSON();
+    json->tp=tp;
+    json->jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
 
 //    return;
     /*按需读取本地文件MD5**************************************************/

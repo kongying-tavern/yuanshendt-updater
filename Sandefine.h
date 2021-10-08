@@ -29,6 +29,21 @@
 "之后还请使用安装包或压缩包安装\r\n"\
 "↓下载地址↓若显示两行还请复制完整\r\n\r\n"\
 "http://download.yuanshen.site/%e7%a9%ba%e8%8d%a7%e9%85%92%e9%a6%86%e5%9c%b0%e5%9b%be%e5%ae%a2%e6%88%b7%e7%ab%af"
+#define uperr_new \
+"请按照以下步骤排查问题:\r\n\r\n"\
+"组合键Shift+L打开日志窗口自查\r\n\r\n"\
+"也可按照以下步骤反馈\r\n"\
+"打开我的电脑\r\n"\
+"复制以下路径并打开:\r\n"\
+"%temp%\\yuanshendt\\Updater\\log\\\r\n"\
+"添加群228382171\r\n"\
+"将文件发给SanMeb\r\n\r\n"\
+"另 交流群群号参见\r\n"\
+"https://yuanshen.site/docs/communication-group.html\r\n"\
+"谢谢!\r\n\r\n"\
+"之后还请使用安装包或压缩包安装\r\n"\
+"↓下载地址↓若显示两行还请复制完整\r\n\r\n"\
+"http://download.yuanshen.site/%e7%a9%ba%e8%8d%a7%e9%85%92%e9%a6%86%e5%9c%b0%e5%9b%be%e5%ae%a2%e6%88%b7%e7%ab%af"
 
 /*moduleCode********************************************/
 #define modulemainWindows 0

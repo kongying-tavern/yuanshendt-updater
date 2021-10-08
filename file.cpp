@@ -16,9 +16,8 @@
 #include "Sandefine.h"
 using namespace std;
 
-void file_search(QString path,QStringList &fileList)//已弃用
+void file_search(QString path,QStringList &fileList)
 {
-    /*已弃用*/
     /*遍历目录*/
     //path=path.replace("/","\\")+"\\";
     //path =path.replace(" ","%20")+"/";
@@ -55,8 +54,8 @@ void file_search(QString path,QStringList &fileList)//已弃用
             //文件夹,递归
             //qDebug()<<"文件夹:"<<fileInfo.filePath();
             file_search(fileInfo.filePath(),fileList);
-        }else{            
-            //文件,添加成员            
+        }else{
+            //文件,添加成员
 
             fileList<<fileInfo.filePath();
         }
@@ -65,23 +64,41 @@ void file_search(QString path,QStringList &fileList)//已弃用
     }while(i < clist.size()); //遍历当前目录完毕
     return;
 }
-
 /*获取环境变量temp*/
 QString getTempPath(QString path)
 {
+    Start::stlog(modulefile,
+                 "获取环境变量"+path,
+                 0);
     return QProcessEnvironment::systemEnvironment().value(path).replace("\\","/");
 }
 /*创建文件夹*/
 bool createFolderSlot(QString path)
 {
+    Start::stlog(modulefile,
+                 "尝试新建目录 "+path,
+                 0);
     bool res;
     QDir dir;
     if (!dir.exists(path))
     {
         res = dir.mkpath(path);
         qDebug()<<"新建目录"<<path<<res;
+        if(res){
+            Start::stlog(modulefile,
+                         "成功",
+                         0);
+        }else{
+            Start::stlog(modulefile,
+                         "失败",
+                         0);
+        }
+
     }else{
         qDebug()<<"目录已存在"<<path;
+        Start::stlog(modulefile,
+                     "目录已存在",
+                     0);
         res = true;
     }
     return res;
@@ -90,10 +107,25 @@ bool createFolderSlot(QString path)
 void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPathFileName)
 {
     //     :/CRT/Resource/crt/curl-ca-bundle.crt
+
     QString resFile=":/"+resProfiex+"/"+resFileName;
-    QFileInfo info(destFullPathFileName);
+    QFileInfo info(destFullPathFileName);    
     createFolderSlot(info.path());
-    QFile::copy(resFile,destFullPathFileName);
+    Start::stlog(modulefile,
+                 "尝试释放资源文件\r\n"+
+                 resFile+
+                 destFullPathFileName,
+                 0);
+    if(QFile::copy(resFile,destFullPathFileName))
+    {
+        Start::stlog(modulefile,
+                     "成功",
+                     0);
+    }else{
+        Start::stlog(modulefile,
+                     "失败",
+                     0);
+    }
 }
 /*读取文本文件并返回字符串*/
 QString readTXT(QString Path)
@@ -167,6 +199,13 @@ QStringList getUptater(QStringList localFilePath
 }
 bool moveFile(QString oldPath,QString newPath)
 {
+    int err;
+    Start::stlog(modulefile,
+                 "更新文件\t"+oldPath,
+                 0);
+    Start::stlog(modulefile,
+                 "\t"+newPath,
+                 0);
     oldPath.replace("\\","/");
     newPath.replace("\\","/");
     qDebug()<<"oldPath:"<<oldPath;
@@ -176,13 +215,19 @@ bool moveFile(QString oldPath,QString newPath)
     QFile nfile(newPath);
     if(nfile.exists())//删除目标文件
     {
-        int err;
+        Start::stlog(modulefile,
+                     "删除目标文件\t"+newPath,
+                     0);
+
         qDebug()<<"删除目标文件";
         DWORD FileAttributes=GetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode());
         if(FileAttributes)
         {
             if (FileAttributes & FILE_ATTRIBUTE_READONLY)
             {
+                Start::stlog(modulefile,
+                             "FILE_ATTRIBUTE_READONLY\t",
+                             0);
                 qDebug()<<"文件为只读";
                 SetLastError(err);
                 SetFileAttributesW(
@@ -190,24 +235,41 @@ bool moveFile(QString oldPath,QString newPath)
                             ,FILE_ATTRIBUTE_NORMAL
                             );
                 err=GetLastError();
+                Start::stlog(modulefile,
+                                     "改写文件属性(下只读) "+errcode2str(err),
+                                     0);
                 qDebug()<<"SetFileAttributesW"<<errcode2str(err);
             }
+        }else{
+            Start::stlog(modulefile,
+                                 "获取文件属性失败",
+                                 0);
+            qDebug()<<"获取文件属性失败";
         }
 
         SetLastError(err);
         if(!nfile.remove())
         {
             err=GetLastError();
-            qDebug()<<"QFile::remove fail"<<errcode2str(err);
+            Start::stlog(modulefile,
+                                 "QFile::remove fail "+errcode2str(err),
+                                 0);
+            qDebug()<<"QFile::remove fail "<<errcode2str(err);
             SetLastError(err);
             if(remove(newPath.replace("/","\\").toLocal8Bit().constData())==-1)
             {
                 err=GetLastError();
+                Start::stlog(modulefile,
+                                     "std::remove fail "+errcode2str(err),
+                                     0);
                 qDebug()<<"std::remove fail"<<errcode2str(err);
                 SetLastError(err);
                 if(DeleteFileW((LPCWSTR)newPath.replace("/","\\").unicode())==0)
                 {
                     err=GetLastError();
+                    Start::stlog(modulefile,
+                                         "winAPI remove fail "+errcode2str(err),
+                                         0);
                     qDebug()<<"winAPI remove fail"<<errcode2str(err);
                     SetLastError(err);
                     return false;
@@ -218,29 +280,55 @@ bool moveFile(QString oldPath,QString newPath)
     QFile ofile(oldPath);
     if(ofile.isOpen())
     {
+        Start::stlog(modulefile,
+                  "文件占用?.?",
+                  0);
         qDebug()<<"文件占用?.?";
-        return false;
+        re = false;
 
     }else{
-
+        SetLastError(err);
+        Start::stlog(modulefile,
+                  "尝试移动文件",
+                  0);
         qDebug()<<"尝试移动文件";
         re = QFile::rename(oldPath,newPath);
         if(!re)
         {
+            err=GetLastError();
+            Start::stlog(modulefile,
+                      "QFile::rename file "+errcode2str(err),
+                      0);
             qDebug()<<"宽字符方法";
             int reint;
-            int err=GetLastError();
+            SetLastError(err);
             reint = rename(
                         oldPath.replace("/","\\").toLocal8Bit().constData(),
                         newPath.replace("/","\\").toLocal8Bit().constData()
                         );
-            qDebug()<<"std::rename"<<reint<<errcode2str(err);
+            err=GetLastError();
+            qDebug()<<"std::rename "<<reint<<errcode2str(err);
             if(reint==0)
             {
                 re=true;
+            }else{
+                Start::stlog(modulefile,
+                          "std::rename fail "+errcode2str(err),
+                          0);
             }
         }
     }
+    if(re)
+    {
+        Start::stlog(modulefile,
+                     "成功--------------",
+                     0);
+    }else{
+        Start::stlog(modulefile,
+                     "失败--------------",
+                     0);
+    }
+
     return re;
 }
 bool fileIsOpen(QString filePath)
