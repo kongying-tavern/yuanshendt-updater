@@ -46,6 +46,7 @@
 "http://download.yuanshen.site/%e7%a9%ba%e8%8d%a7%e9%85%92%e9%a6%86%e5%9c%b0%e5%9b%be%e5%ae%a2%e6%88%b7%e7%ab%af"
 
 /*moduleCode********************************************/
+#define _version "v1.2.alpha_2"
 #define modulemainWindows 0
 #define moduleStart 1
 #define moduleHTTP 2

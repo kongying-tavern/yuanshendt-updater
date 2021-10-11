@@ -44,18 +44,21 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     //logViewer *logUI(new logViewer);
     logUI = new logViewer(this);
     logUI->setModal(false);
+    logUI->setWindowTitle(_version);
     //logUI->show();
     connect(this, &MainWindow::moveLogViewer
             ,logUI, &logViewer::moveLogViewer);
-
+    logUI->log(modulemainWindows,"窗口初始化√",NULL);
     if(pathStr == nullptr)
     {
+        logUI->log(modulemainWindows,"无传参",NULL);
         MainWindow::mutualUi->changeMainPage(1);//无路径传参,显示选择路径按钮
 
     }else{
         QFileInfo info(pathStr);
         workPath=info.path();
         qDebug()<<"workPath:"<<workPath;
+        logUI->log(modulemainWindows,"传参路径："+workPath,NULL);
         threadWork(workPath);
     }
 
@@ -173,9 +176,11 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
     //getExistingDirectory(父对象一般是this,对话框标题,对话框开始目录  一般是"./",默认是只显示目录-https://doc.qt.io/qt-5/qfiledialog.html#Option-enum);
     //返回空对象则没选
     //选择了目录则返回QString
+    logUI->log(modulemainWindows,"on_pushButton_Start_clicked()",NULL);
     if(alldone)
     {
-
+        logUI->log(modulemainWindows,"尝试打开空荧地图",NULL);
+        logUI->log(modulemainWindows,"start "+workPath+"/Map.exe",NULL);
         qDebug()<<QString("start "+workPath+"/Map.exe");
         QProcess process(this);
         QStringList argument;
@@ -193,9 +198,13 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
         argument <<"/c";
         if(process.startDetached())
         {
+            qDebug()<<"start √";
+            logUI->log(modulemainWindows,"这句日志看不到了",NULL);
             QApplication* app;
             app->exit(0);
         }else{
+            qDebug()<<"start ×";
+            logUI->log(modulemainWindows,"start ×",NULL);
             QMessageBox::information(this,
                                      "出了点问题",
                                      "请手动打开空荧地图/n能搞出这个提示San表示San也不知道怎么回事"
@@ -212,10 +221,13 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
                     "空荧酒馆地图安装目录(不会创建子文件夹!)",
                     "./",
                     QFileDialog::ShowDirsOnly
-                );
+                );        
         tem =dir.toStdString();
-        qDebug()<<dir;
+        qDebug()<<"目标路径"<<dir;
+        logUI->log(modulemainWindows,"目标路径"+dir,NULL);
         if(string(tem)==""){
+            logUI->log(modulemainWindows,"为空路径",NULL);
+            qDebug()<<"空路径";
             MainWindow::changeMainPage0label_Text("?刚才发生了什么?");
         }else{
             workPath=dir;
@@ -227,6 +239,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
 }
 void MainWindow::threadWork(QString path)
 {
+    logUI->log(modulemainWindows,"初始化",NULL);
     updaterIsRunning = true;
     MainWindow::startThread(path);
 }
@@ -240,6 +253,7 @@ void MainWindow::startThread(QString path)
             delete ttstart;
         }
     //创建多线程工作对象
+    logUI->log(modulemainWindows,"新建线程",NULL);
     ttstart = new Start(path, NULL);
 
     //连接工作触发信号
@@ -255,7 +269,9 @@ void MainWindow::startThread(QString path)
     connect(ttstart,&Start::log
             ,logUI,&logViewer::log);
     //开始工作
+    logUI->log(modulemainWindows,"新建定时器",NULL);
     timer1 = startTimer(500);//0.5s定时器
+    logUI->log(modulemainWindows,"激活任务线程",NULL);
     emit ttstart->tstart();
 }
 void MainWindow::updataDlingmag()
@@ -274,11 +290,14 @@ void MainWindow::timerEvent(QTimerEvent *event)
 }
 void MainWindow::Work_Finished(bool done)
 {
+    logUI->log(modulemainWindows,"任务线程主动上报完成信号",NULL);
     alldone=done;
+    logUI->log(modulemainWindows,"删除计时器",NULL);
     killTimer(timer1);
 }
 void MainWindow::Work_MessageBox(int tag,QString title,QString txt)
 {
+    logUI->log(modulemainWindows,"非模态对话框 "+QString::number(tag),NULL);
     QMessageBox *box=new QMessageBox(this);
     switch (tag) {
         case 0:

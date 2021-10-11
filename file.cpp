@@ -321,11 +321,11 @@ bool moveFile(QString oldPath,QString newPath)
     if(re)
     {
         Start::stlog(modulefile,
-                     "成功--------------",
+                     "成功--------------\r\n",
                      0);
     }else{
         Start::stlog(modulefile,
-                     "失败--------------",
+                     "失败--------------\r\n",
                      0);
     }
 
