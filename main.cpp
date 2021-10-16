@@ -42,7 +42,7 @@ void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QStr
     }
     // 设置输出json格式
     joc.insert("Time",
-               QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch())
+               QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch())
                );
     joc.insert("File",context.file);
     joc.insert("Line",context.line);

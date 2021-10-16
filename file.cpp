@@ -216,17 +216,17 @@ bool moveFile(QString oldPath,QString newPath)
     if(nfile.exists())//删除目标文件
     {
         Start::stlog(modulefile,
-                     "删除目标文件\t"+newPath,
+                     "检查文件属性\t",
                      0);
-
-        qDebug()<<"删除目标文件";
+        qDebug()<<"文件为只读";
+        SetLastError(err);
         DWORD FileAttributes=GetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode());
         if(FileAttributes)
         {
             if (FileAttributes & FILE_ATTRIBUTE_READONLY)
             {
                 Start::stlog(modulefile,
-                             "FILE_ATTRIBUTE_READONLY\t",
+                             "文件为只读\tFILE_ATTRIBUTE_READONLY",
                              0);
                 qDebug()<<"文件为只读";
                 SetLastError(err);
@@ -242,11 +242,14 @@ bool moveFile(QString oldPath,QString newPath)
             }
         }else{
             Start::stlog(modulefile,
-                                 "获取文件属性失败",
+                                 "获取文件属性失败"+errcode2str(err),
                                  0);
-            qDebug()<<"获取文件属性失败";
+            qDebug()<<"获取文件属性失败"+errcode2str(err);
         }
-
+        Start::stlog(modulefile,
+                             "删除目标文件",
+                             0);
+        qDebug()<<"删除目标文件";
         SetLastError(err);
         if(!nfile.remove())
         {
