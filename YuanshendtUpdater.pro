@@ -33,7 +33,8 @@ SOURCES += \
     file.cpp \
     logviewer.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    md5maker.cpp
 
 HEADERS += \
     HTTP.h \
@@ -44,11 +45,13 @@ HEADERS += \
     file.h \
     logviewer.h \
     mainwindow.h \
+    md5maker.h \
     my.rc
 
 FORMS += \
     logviewer.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    md5maker.ui
 
 TRANSLATIONS += \
     YuanshendtUpdater_zh_CN.ts

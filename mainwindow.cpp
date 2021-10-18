@@ -9,7 +9,7 @@
 
 #include <shlwapi.h>
 #include "Sandefine.h"
-#include "logviewer.h"
+
 #include <HTTP.h>
 
 
@@ -168,6 +168,16 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     if(e->key()==Qt::Key_L && e->modifiers()==Qt::ShiftModifier)
     {
         if(logUI)logUI->show();
+    }
+    if(e->key()==Qt::Key_M && e->modifiers()==Qt::ShiftModifier)
+    {
+        if(md5makerUI==nullptr)
+        {
+            md5makerUI=new md5maker(this);
+            md5makerUI->setModal(false);
+            md5makerUI->setWindowTitle(_version);
+        }
+       md5makerUI->show();
     }
 }
 

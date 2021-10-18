@@ -52,7 +52,7 @@
      <string notr="true">background:rgb(255,255,255);</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_Dling">
      <widget class="QLabel" name="label_Text">
@@ -66,7 +66,6 @@
       </property>
       <property name="font">
        <font>
-        <family>微软雅黑</family>
         <pointsize>-1</pointsize>
         <kerning>false</kerning>
        </font>
@@ -145,7 +144,6 @@ background:rgb(58, 59, 64);
       </property>
       <property name="font">
        <font>
-        <family>微软雅黑 Light</family>
         <pointsize>-1</pointsize>
        </font>
       </property>
@@ -175,7 +173,6 @@ font-size:16px;
       </property>
       <property name="font">
        <font>
-        <family>微软雅黑</family>
         <pointsize>-1</pointsize>
        </font>
       </property>
@@ -254,7 +251,7 @@ background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bmin1.png)
      </rect>
     </property>
     <property name="mouseTracking">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
@@ -286,7 +283,6 @@ background-image:url(:/TitleButtonImage/Resource/TitlePudhButtonStyle/bexit1.png
     </property>
     <property name="font">
      <font>
-      <family>微软雅黑 Light</family>
       <pointsize>18</pointsize>
      </font>
     </property>

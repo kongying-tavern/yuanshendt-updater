@@ -73,7 +73,6 @@ void logViewer::log(int module,QString str,int mod=NULL)
                 //push_back以后size变了会多循环一轮了日志重复添加了
             }
         }
-
     }
         break;
     default:

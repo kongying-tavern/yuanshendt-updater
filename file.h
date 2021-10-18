@@ -25,6 +25,7 @@ void saveResourecFile(QString resProfiex,
                       QString destFullPathFileName
                       );
 QString readTXT(QString Path);
+void writeTXT(QString* data,QString Path,QString fileName);
 QStringList getUptater(QStringList localFilePath,
                        QStringList localFileMD5,
                        QStringList newFilePath,

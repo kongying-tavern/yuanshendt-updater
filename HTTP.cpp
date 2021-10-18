@@ -164,7 +164,6 @@ size_t HTTP::write_data(void *ptr, size_t size, size_t nmemb, void *stream)
     FILE * pFile = (FILE *)stream;
     size_t retSize;
     retSize = fwrite(ptr,size,nmemb,pFile);
-    //cout<<size*nmemb<<"bytes"<<" received!"<<endl;
     fflush(pFile);
     return retSize;
 

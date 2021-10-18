@@ -127,6 +127,19 @@ void saveResourecFile(QString resProfiex,QString resFileName,QString destFullPat
                      0);
     }
 }
+void writeTXT(QString* data,QString Path,QString fileName)
+{
+    createFolderSlot(Path);
+    QFile file(Path
+               +fileName
+               );
+    file.open(QFile::WriteOnly);
+    file.write(
+                data->replace("},{","},\r\n{")//数组分行
+                .toLocal8Bit()
+                );
+    file.close();
+}
 /*读取文本文件并返回字符串*/
 QString readTXT(QString Path)
 {

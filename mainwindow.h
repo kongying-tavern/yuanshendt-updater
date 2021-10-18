@@ -16,6 +16,8 @@ QT_BEGIN_NAMESPACE
 #include <iostream>
 
 #include "logviewer.h"
+#include "md5maker.h"
+
 using namespace std;
 
 namespace Ui
@@ -52,6 +54,7 @@ signals:
     void moveLogViewer(QPoint e,QPoint mainPoint);
 public:
     logViewer *logUI;
+    md5maker *md5makerUI = nullptr;
     /*窗口托管*/
     static MainWindow *mutualUi;
     /*窗口控制托管sub*/
