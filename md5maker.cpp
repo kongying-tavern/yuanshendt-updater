@@ -58,7 +58,7 @@ void md5maker::on_pushButton_clicked()
         QJsonObject job2;
         job2.insert("Length",file.size());
         job.insert("data",job2);
-        job.insert("Path",QString(fileList.at(i)).replace(md5makerWorkPath+"/",""));
+        job.insert("filePath",QString(fileList.at(i)).replace(md5makerWorkPath+"/",""));
         job.insert("MD5",getFlieMD5(fileList.at(i)));
         job.insert("version",MD5jsonVersion);
         //qDebug()<<job;
