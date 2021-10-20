@@ -243,7 +243,7 @@ void Start::work()
     QStringList needUpdate;
     QStringList needUpdateMD5;
     qDebug()<<"按需读取本地文件MD5:"<<path;
-    tp->stlog(moduleStart,"按需读取本地文件MD5",NULL);
+    emit log(moduleStart,"按需读取本地文件MD5",NULL);
     QString omd5;
     for(int i = 0; i< newFileList.size();++i)
     {
@@ -273,7 +273,7 @@ void Start::work()
      * 下载文件前需要对字符串做很多工作
      * 一是反斜杠转斜杠并删除第一个斜杠
      */
-    tp->stlog(moduleStart,"根据本地文件MD5下载需要更新的文件",NULL);
+    emit log(moduleStart,"根据本地文件MD5下载需要更新的文件",NULL);
     QString tem;
     MainWindow::mutualUi->changeProgressBarColor(
                 QString("#3880cc")
@@ -282,10 +282,11 @@ void Start::work()
     totalFile=needUpdate.size();
     doneFile=0;
     //初始libcurl线程池
-    tp->stlog(moduleStart,"初始libcurl线程池",NULL);
-    tp->stlog(moduleStart,"设置同时下载任务数为"+QString::number(maxDlThreah),NULL);
+    emit log(moduleStart,"初始libcurl线程池",NULL);
+    emit log(moduleStart,"设置同时下载任务数为"+QString::number(maxDlThreah),NULL);
     tpoolhttp=QThreadPool::globalInstance();
     tpoolhttp->setMaxThreadCount(maxDlThreah);
+    //tpoolhttp->setMaxThreadCount(needUpdate.size());//A8:我tm谢谢你
     tpoolhttp->setExpiryTimeout(-1);
 
     for(int i = 0; i< needUpdate.size();++i)
@@ -293,7 +294,7 @@ void Start::work()
         if(needUpdateMD5.at(i)!=getFlieMD5(tempPath+"download/Map/"+needUpdate.at(i)))
         {
             qDebug()<<"全新下载";
-            tp->stlog(moduleStart,"新建下载任务\t"+needUpdate.at(i),NULL);
+            emit log(moduleStart,"新建下载任务\t"+needUpdate.at(i),NULL);
             //构造下载链接
             QString url=dlurlMap+QUrl::toPercentEncoding(needUpdate.at(i));
             QString dlpath="Map/"+QString(needUpdate.at(i));

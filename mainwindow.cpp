@@ -8,8 +8,8 @@
 
 
 #include <shlwapi.h>
-#include "Sandefine.h"
 
+#include "Sandefine.h"
 #include <HTTP.h>
 
 
@@ -23,11 +23,11 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-
-
     //qDebug()<<(pathStr);
     ui->setupUi(this);
     mutualUi = this;//托管初始化，非常重要
+
+
 
     this->setWindowFlag(Qt::FramelessWindowHint); // 无边框窗口
     setAttribute(Qt::WA_TranslucentBackground, true);  // 背景透明
@@ -143,6 +143,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)  // 移动窗口(根据windowsMo
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
+
+    qDebug()<<"窗口句柄"<<this->winId();
     emit moveLogViewer(this->pos(),QPoint(this->width(),0));
 }
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)//鼠标任何按键松开
@@ -177,10 +179,52 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             md5makerUI->setModal(false);
             md5makerUI->setWindowTitle(_version);
         }
-       md5makerUI->show();
+        md5makerUI->show();
     }
 }
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
+{
+    if (eventType == "windows_generic_MSG")//WINDOWS环境
+    {
+        Q_UNUSED(eventType);
+        MSG *msg = static_cast<MSG*>(message);  //类型转换
+        qDebug()<<msg->message<<msg->lParam<<msg->wParam;
+        /*此处的结构也可用switch来代替*/
+        if(msg->message==WM_COPYDATA)
+        {
+            qDebug()<<"妈的终于跑通了";
+            COPYDATASTRUCT *data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
 
+            qDebug()<<"接收到的消息类型"<<data->dwData;
+            switch (data->dwData)
+            {
+            case 0:
+                //wchar
+            {
+                data->lpData;
+                data->cbData;
+                QString str;
+                str=QString((char*)data->lpData);
+                qDebug()<<"接收到的文本消息"<<str;
+            }
+                break;
+            case 1:
+                //int
+                break;
+            default:
+                break;
+            }
+
+            *result=233;
+            return true;  //返回值为false表示该事件还会继续向上传递，被其他捕获
+        }
+    }
+    if (eventType == "NSEvent")//MacOS环境
+    {}
+    if (eventType == "xcb_generic_event_t")//Linux环境
+    {}
+    return false;
+}
 void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_search(多线程已完成)*/
 {
     //getExistingDirectory(父对象一般是this,对话框标题,对话框开始目录  一般是"./",默认是只显示目录-https://doc.qt.io/qt-5/qfiledialog.html#Option-enum);
@@ -195,7 +239,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
         QProcess process(this);
         QStringList argument;
         /*
-        process.setProgram("cmd");        
+        process.setProgram("cmd");
         argument <<"/c"
                  <<"start"
                  <<""""
@@ -231,7 +275,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
                     "空荧酒馆地图安装目录(不会创建子文件夹!)",
                     "./",
                     QFileDialog::ShowDirsOnly
-                );        
+                    );
         tem =dir.toStdString();
         qDebug()<<"目标路径"<<dir;
         logUI->log(modulemainWindows,"目标路径"+dir,NULL);
@@ -259,9 +303,9 @@ void MainWindow::startThread(QString path)
     //startUpdate(path);
     //正经多线程
     if (ttstart != nullptr)
-        {
-            delete ttstart;
-        }
+    {
+        delete ttstart;
+    }
     //创建多线程工作对象
     logUI->log(modulemainWindows,"新建线程",NULL);
     ttstart = new Start(path, NULL);
@@ -310,16 +354,16 @@ void MainWindow::Work_MessageBox(int tag,QString title,QString txt)
     logUI->log(modulemainWindows,"非模态对话框 "+QString::number(tag),NULL);
     QMessageBox *box=new QMessageBox(this);
     switch (tag) {
-        case 0:
-            //信息
-            box->setIcon(QMessageBox::Information);
-            break;
-        case 1:
-            //错误
-            box->setIcon(QMessageBox::Warning);
-            break;
-        default:
-            printf("----------?--------\n");
+    case 0:
+        //信息
+        box->setIcon(QMessageBox::Information);
+        break;
+    case 1:
+        //错误
+        box->setIcon(QMessageBox::Warning);
+        break;
+    default:
+        printf("----------?--------\n");
     }
     box->setWindowTitle(title);
     box->setText(txt);

@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <windows.h>
+//#include <windows.h>
+#include <qt_windows.h>
 #include <windowsx.h>
 #include <QtWidgets/QMessageBox>
 #include <QMouseEvent>
@@ -42,6 +43,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e);
     void showEvent(QShowEvent *event);
     void keyPressEvent(QKeyEvent *e);
+    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result);
 private slots:
     void on_pushButton_Start_clicked();
     void on_pushButton_Exit_clicked();

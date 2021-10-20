@@ -8,8 +8,8 @@ IDI_ICON1  ICON  "Resource\\MainIcon.ico"
 #endif
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION 1,2,1,211019
-    PRODUCTVERSION 1,2,1,211019
+    FILEVERSION 1,3,1,211021
+    PRODUCTVERSION 1,3,1,211021
     FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
     FILEFLAGS VS_FF_DEBUG
@@ -25,12 +25,12 @@ VS_VERSION_INFO VERSIONINFO
             BLOCK "080404b0"
             BEGIN
                 VALUE "CompanyName", "\0"
-                VALUE "FileDescription", "KYUpdater_v1.2.1.alpha_2"
-                VALUE "FileVersion", "v1.2.1.alpha_2\0"
-                VALUE "ProductVersion", "v1.2.1.alpha_2\0"
+                VALUE "FileDescription", "KYUpdater_v1.3.1.alpha_2"
+                VALUE "FileVersion", "v1.3.1.alpha_2\0"
+                VALUE "ProductVersion", "v1.3.1.alpha_2\0"
                 VALUE "LegalCopyright", "\0"
                 VALUE "LegalTrademarks", "\0"
-                VALUE "OriginalFilename", "KYUpdater_v1.2.1.alpha_2.exe\0"
+                VALUE "OriginalFilename", "KYUpdater_v1.3.1.alpha_2.exe\0"
                 VALUE "ProductName", "YuanshendtUpdater\0\0"
                 VALUE "InternalName", "xxxxxxxxxxxx.exe\0"
            END
