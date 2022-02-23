@@ -18,7 +18,7 @@ bool updaterIsRunning;
 bool alldone=false;
 QString workPath;
 MainWindow *MainWindow::mutualUi = nullptr;/*托管初始化，非常重要*/
-
+QPropertyAnimation * progressBaranimation = nullptr;//进度条动画
 MainWindow::MainWindow(QWidget *parent, QString pathStr)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     shadow->setBlurRadius(15);//设定阴影的模糊半径，数值越大越模糊
     ui->label_Shadow->setGraphicsEffect(shadow);
 
-    /*初始化装逼窗口*/
+    /*初始化logviewer*/
     //logViewer *logUI(new logViewer);
     logUI = new logViewer(this);
     logUI->setModal(false);
@@ -49,6 +49,14 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     connect(this, &MainWindow::moveLogViewer
             ,logUI, &logViewer::moveLogViewer);
     logUI->log(modulemainWindows,"窗口初始化√",NULL);
+
+    /*进度条动画*/
+    progressBaranimation =new QPropertyAnimation(ui->progressBar, "value");
+    progressBaranimation->setDuration(300);
+    progressBaranimation->setStartValue(ui->progressBar->value());
+    progressBaranimation->setEasingCurve(QEasingCurve::InOutQuad);
+
+    /*检查传参*/
     if(pathStr == nullptr)
     {
         logUI->log(modulemainWindows,"无传参",NULL);
@@ -84,14 +92,21 @@ void MainWindow::changeMainPage(int mod,bool done)/*托管修改MainPage*/
 }
 void MainWindow::Work_Process(int a,int b)
 {
+    //ui->progressBar->setValue((int)(100*(float(a)/float(b))));
+    //return;
     //MainWindow::changeProgressBarValue(a,b);
-    int c=(int)(100*(float(a)/float(b)));
-    QPropertyAnimation * animation =new QPropertyAnimation(ui->progressBar, "value");
-    animation->setDuration(300);
-    animation->setStartValue(ui->progressBar->value());
-    animation->setEndValue(c);
-    animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    if(progressBaranimation!=nullptr)
+    {
+        progressBaranimation->stop();
+        int c=(int)(100*(float(a)/float(b)));
+        progressBaranimation->setStartValue(ui->progressBar->value());
+        progressBaranimation->setEndValue(c);
+        //progressBaranimation->start(QAbstractAnimation::DeleteWhenStopped);KeepWhenStopped
+        progressBaranimation->start(QAbstractAnimation::KeepWhenStopped);
+    }else{
+        ui->progressBar->setValue((int)(100*(float(a)/float(b))));
+    }
+
 }
 void MainWindow::Work_Dlnow(QString txt)
 {
@@ -188,7 +203,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
     {
         Q_UNUSED(eventType);
         MSG *msg = static_cast<MSG*>(message);  //类型转换
-        qDebug()<<msg->message<<msg->lParam<<msg->wParam;
+        //qDebug()<<msg->message<<msg->lParam<<msg->wParam;
         /*此处的结构也可用switch来代替*/
         if(msg->message==WM_COPYDATA)
         {
@@ -217,6 +232,8 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
 
             *result=233;
             return true;  //返回值为false表示该事件还会继续向上传递，被其他捕获
+        }else{
+            /*others message*/
         }
     }
     if (eventType == "NSEvent")//MacOS环境
@@ -322,6 +339,19 @@ void MainWindow::startThread(QString path)
     //日志窗口信号
     connect(ttstart,&Start::log
             ,logUI,&logViewer::log);
+    //ui控制信号
+    connect(ttstart, &Start::changeMainPage
+            ,this, &MainWindow::changeMainPage);
+    connect(ttstart, &Start::changeMainPage0label_Text
+            ,this, &MainWindow::changeMainPage0label_Text);
+    connect(ttstart, &Start::changeProgressBarValue
+            ,this, &MainWindow::changeProgressBarValue);
+    connect(ttstart, &Start::changeProgressBarColor
+            ,this, &MainWindow::changeProgressBarColor);
+    connect(ttstart, &Start::changePBText
+            ,this, &MainWindow::changePBText);
+    connect(ttstart, &Start::updataDlingmag
+            ,this, &MainWindow::updataDlingmag);
     //开始工作
     logUI->log(modulemainWindows,"新建定时器",NULL);
     timer1 = startTimer(500);//0.5s定时器

@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 RC_FILE += my.rc
 CONFIG += c++17
 #日志窗口
-CONFIG +=console
+#CONFIG +=console
 #日志输出
 DEFINES += QT_MESSAGELOGCONTEXT
 # The following define makes your compiler emit warnings if you use

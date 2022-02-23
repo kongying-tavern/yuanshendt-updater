@@ -106,7 +106,7 @@ int HTTP::httpDownLoad(QString URL,QString Path)
     //curl_easy_setopt(handle, CURLOPT_HEADER, 1);    //需要header
     //curl_easy_setopt(handle, CURLOPT_NOBODY, 1);    //不需要body
     curl_easy_setopt(handle,CURLOPT_FOLLOWLOCATION,1);//设置跟随重定向
-    curl_easy_setopt(handle,CURLOPT_MAXCONNECTS,20);//设置最大连接数
+    curl_easy_setopt(handle,CURLOPT_MAXCONNECTS,8);//设置最大连接数
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);//不下载>400页面
     curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0L);//获取进度信息
     curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION, this->progress_callback);//进度条

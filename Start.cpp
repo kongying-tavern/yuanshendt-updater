@@ -23,12 +23,12 @@ Start::Start(QString dir, QObject *parent)
     qDebug()<<"Start被创建";
     tp->stlog(moduleStart,"Start被创建",NULL);
     http = new HTTP("","",NULL);//单线程下载
-    connect(this, &Start::tstart, this, &Start::work);
+
     connect(http, &HTTP::tworkMessageBox, this, &Start::tworkMessageBox);
 
     workProcess = new QThread;
-
     moveToThread(workProcess);
+    connect(this, &Start::tstart, this, &Start::work);
     workProcess->start();
     this->dir = dir;
 
@@ -55,7 +55,7 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             //netspeed[i].hisDl=0;
             //netspeed[i].total=0;
             //netspeed[i].path="";
-            MainWindow::mutualUi->updataDlingmag();//更新进度文本
+            emit tp->updataDlingmag();//强制更新进度文本
         }
     }
     for(int i=0;i<3;++i)
@@ -138,9 +138,9 @@ void Start::updaterErr()
 {
     tp->stlog(moduleStart,"自动更新失败",NULL);
     emit tworkProcess(0,1);
-    MainWindow::mutualUi->changePBText("自动更新失败,请单击重试");
+    emit this->changePBText("自动更新失败,请单击重试");
     emit tworkFinished(false);
-    MainWindow::mutualUi->changeMainPage(1,false);
+    emit this->changeMainPage(1,false);
     emit tworkMessageBox(1,
                          "自动更新失败",
                          uperr_new);
@@ -162,7 +162,7 @@ void Start::work()
     QString path=this->dir;
     //Start::updaterErr();
     //return;
-    MainWindow::mutualUi->changeMainPage(0);
+    emit this->changeMainPage(0);
     qDebug()<<"工作目标："<<path;
     tp->stlog(moduleStart,"工作目标："+path,NULL);
     //return;
@@ -174,25 +174,25 @@ void Start::work()
     {
         qDebug()<<"目标目录找到原神本体";
         tp->stlog(moduleStart,"目标目录找到原神本体",NULL);
-        MainWindow::mutualUi->changeProgressBarColor(
+        emit this->changeProgressBarColor(
                     QString("rgb(255, 0, 0)")
                     ,QString("rgb(255, 0, 0)"));
-        MainWindow::mutualUi->changeMainPage0label_Text("?");
+        emit this->changeMainPage0label_Text("?");
         emit tworkMessageBox(
                     1,
                     "我受过专业的训练",
                     "但是请你不要把地图装在原神目录"
                     );
-        MainWindow::mutualUi->changeMainPage(1,false);
+        emit this->changeMainPage(1,false);
         emit tworkFinished(false);
         tp->stlog(moduleStart,"线程主动退出",NULL);
         return;
     }
     /*获取系统环境变量temp*********************************************/
-    MainWindow::mutualUi->changeMainPage0label_Text("初始化...");
+    emit this->changeMainPage0label_Text("初始化...");
     tp->stlog(moduleStart,"初始化...",NULL);
     emit tworkProcess(1,2);
-    MainWindow::mutualUi->changeProgressBarColor(
+    emit this->changeProgressBarColor(
                 QString("rgb(235, 235, 235)")
                 ,QString("rgb(58, 59, 64)"));
     QString tempPath;
@@ -216,7 +216,7 @@ void Start::work()
      * path "md5.json"
      */
     tp->stlog(moduleStart,"\r\n获取在线文件MD5json",NULL);
-    MainWindow::mutualUi->changeMainPage0label_Text("获取在线文件MD5...");
+    emit this->changeMainPage0label_Text("获取在线文件MD5...");
     http->httpDownLoad(dlurl"md5.json","md5.json");
     /*读取在线文件md5.json到
       * QJson  newmd5.json
@@ -253,7 +253,7 @@ void Start::work()
         emit log(moduleMD5,"本地文件:\t"+newFileList.at(i),NULL);
         emit log(moduleMD5,"本地MD5:\t"+omd5,NULL);
         emit tworkProcess(i,newFileList.size());
-        MainWindow::mutualUi->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
+        emit this->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
         if(newFileMD5.at(i) == omd5)
         {
             emit log(moduleMD5,"云端MD5\t"+newFileMD5.at(i),NULL);
@@ -275,7 +275,7 @@ void Start::work()
      */
     emit log(moduleStart,"根据本地文件MD5下载需要更新的文件",NULL);
     QString tem;
-    MainWindow::mutualUi->changeProgressBarColor(
+    emit this->changeProgressBarColor(
                 QString("#3880cc")
                 ,QString("#00c500"));
     int retry=0;//多线程下载如何重试QAQ
@@ -324,7 +324,6 @@ void Start::work()
     tpoolhttp->clear();
     qDebug()<<"下载完成";
     tp->stlog(moduleStart,"下载完成",NULL);
-    //MainWindow::mutualUi->changeMainPage0label_Text("下载完成");
     //qDebug()<<FindWindowW(NULL,(LPCWSTR)QString("「空荧酒馆」原神地图").unicode());//地图进程窗口
 
     //return;
@@ -334,9 +333,8 @@ void Start::work()
       * 下载好的地图存在%temp%\download\Map\
       * 移动的目标文件夹为path
       */
-    //MainWindow::mutualUi->changeMainPage0label_Text("正在移动文件");
     tp->stlog(moduleStart,"正在移动文件",NULL);
-    MainWindow::mutualUi->changeProgressBarColor(
+    emit this->changeProgressBarColor(
                 QString("#00c500")
                 ,QString("#078bff"));
     int f=0;
@@ -358,7 +356,7 @@ void Start::work()
                   "|"+
                   QString::number(needUpdate.size())
                   ;
-        MainWindow::mutualUi->changeMainPage0label_Text(
+        emit this->changeMainPage0label_Text(
                     QString::number(i+1)+
                     "|"+
                     QString::number(needUpdate.size())+
@@ -386,8 +384,8 @@ void Start::work()
         emit tworkProcess(i,needUpdate.size());
     }
     emit tworkProcess(1,1);
-    MainWindow::mutualUi->changeMainPage0label_Text("不存在的看不到这句话的");
-    MainWindow::mutualUi->changeMainPage(1,true);
+    emit this->changeMainPage0label_Text("不存在的看不到这句话的");
+    emit this->changeMainPage(1,true);
     emit tworkFinished(true);
     tp->stlog(moduleStart,"更新流程结束",NULL);
 }

@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     logfile=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
     qInstallMessageHandler(MessageOutput);//启动日志
     cleanLog();//清理旧日志
-    qDebug()<<_version;
+    qDebug()<<"version"<<_version;
 
     //qDebug()<<"工作路径"<<QString(plwordPath);
     QString tem="";

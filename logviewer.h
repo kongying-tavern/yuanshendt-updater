@@ -19,7 +19,6 @@ struct logHTTP
     int tid;
     QStringList log;
 };
-//QLabel *logLabel[5];
 
 
 namespace Ui {

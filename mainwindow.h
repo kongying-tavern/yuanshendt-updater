@@ -54,23 +54,27 @@ private slots:
 signals:
     void stopTwork();
     void moveLogViewer(QPoint e,QPoint mainPoint);
-public:
-    logViewer *logUI;
-    md5maker *md5makerUI = nullptr;
-    /*窗口托管*/
-    static MainWindow *mutualUi;
-    /*窗口控制托管sub*/
+public slots:
+    /*窗口控制托管槽*/
     void changeMainPage(int page,bool done=false);/*修改MainPage,0:进度条 1:选择目录按钮*/
     void changeMainPage0label_Text(QString str);/*修改MainPage->Label_Text文本*/
     void changeProgressBarValue(int a,int b);/*修改进度条进度*/
     void changeProgressBarColor(QString rgba,QString rgbb);
     void changePBText(QString str);//修改按钮文本
+    void updataDlingmag();//强制刷新进度文本
+public:
+    logViewer *logUI;
+    md5maker *md5makerUI = nullptr;
+    /*窗口托管*/
+    static MainWindow *mutualUi;
+
+
     void Work_Dlnow(QString txt);
     void Work_MessageBox(int tag,QString title,QString txt);//信息框
     /*多线程*/
     void threadWork(QString path);
     void startThread(QString path);
-    void updataDlingmag();
+
 public:
     //void msgBoxClosed(QAbstractButton*);//非模态消息框回调
 

@@ -1,4 +1,4 @@
-#include "md5maker.h"
+﻿#include "md5maker.h"
 #include "ui_md5maker.h"
 #include <QDir>
 #include <QString>
@@ -65,10 +65,6 @@ void md5maker::on_pushButton_clicked()
         allJson.push_back(job);
     }
     qDebug()<<allJson.size();
-//    for (int i = 0; i < allJson.size(); ++i)
-//    {
-//        qDebug()<<allJson.at(i);
-//    }
 
     for (int a = 0; a < allJson.size(); ++a)
     {
