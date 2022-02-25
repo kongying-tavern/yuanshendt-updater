@@ -16,6 +16,8 @@
 #include "MD5.cpp"
 #include "file.cpp"
 #include "Sandefine.h"
+
+
 void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 
@@ -53,15 +55,13 @@ void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QStr
     // 加锁
     mutex.lock();
     // 写日志
-    QFile file(logfile);
-    file.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream stream(&file);
-    stream.setEncoding(QStringConverter::Utf8);
-    QString jsonstr= QJsonDocument(joc).toJson();
 
-    stream <<jsonstr.toUtf8().toBase64()<<"\n";
-    stream.flush();//强制写出
-    file.close();
+    logstream->setEncoding(QStringConverter::Utf8);
+    QString jsonstr= QJsonDocument(joc).toJson();
+    //stream->
+    *logstream <<jsonstr.toUtf8().toBase64()+"\n";
+    logstream->flush();//强制写出
+    //logfile.close();
     // 解锁
     mutex.unlock();
 }
@@ -82,7 +82,10 @@ int main(int argc, char *argv[])
             +updaterTempDir
             +"log/";
     createFolderSlot(logPath);
-    logfile=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
+    logfilePath=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
+    logfile=new QFile(logfilePath);
+    logfile->open(QIODevice::WriteOnly | QIODevice::Append);
+    logstream=new QTextStream(logfile);
     qInstallMessageHandler(MessageOutput);//启动日志
     cleanLog();//清理旧日志
     qDebug()<<"version"<<_version;

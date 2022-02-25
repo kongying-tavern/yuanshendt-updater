@@ -15,8 +15,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QByteArray>
 using namespace std;
-//初始化
-
 
 HTTP::HTTP(QString URL,QString Path,QObject *parent)
     : QObject(parent)

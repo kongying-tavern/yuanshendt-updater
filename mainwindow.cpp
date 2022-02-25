@@ -19,6 +19,7 @@ bool alldone=false;
 QString workPath;
 MainWindow *MainWindow::mutualUi = nullptr;/*托管初始化，非常重要*/
 QPropertyAnimation * progressBaranimation = nullptr;//进度条动画
+QThread tprogressBaranimation;
 MainWindow::MainWindow(QWidget *parent, QString pathStr)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -52,9 +53,10 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
 
     /*进度条动画*/
     progressBaranimation =new QPropertyAnimation(ui->progressBar, "value");
-    progressBaranimation->setDuration(300);
+    progressBaranimation->setDuration(100);
     progressBaranimation->setStartValue(ui->progressBar->value());
     progressBaranimation->setEasingCurve(QEasingCurve::InOutQuad);
+
 
     /*检查传参*/
     if(pathStr == nullptr)
@@ -92,21 +94,21 @@ void MainWindow::changeMainPage(int mod,bool done)/*托管修改MainPage*/
 }
 void MainWindow::Work_Process(int a,int b)
 {
-    //ui->progressBar->setValue((int)(100*(float(a)/float(b))));
-    //return;
-    //MainWindow::changeProgressBarValue(a,b);
+
+    ui->progressBar->setValue((int)(100*(float(a)/float(b))));
+    return;
+
     if(progressBaranimation!=nullptr)
     {
-        progressBaranimation->stop();
         int c=(int)(100*(float(a)/float(b)));
+        //progressBaranimation->stop();
+        progressBaranimation->setCurrentTime(200);
         progressBaranimation->setStartValue(ui->progressBar->value());
         progressBaranimation->setEndValue(c);
-        //progressBaranimation->start(QAbstractAnimation::DeleteWhenStopped);KeepWhenStopped
         progressBaranimation->start(QAbstractAnimation::KeepWhenStopped);
     }else{
         ui->progressBar->setValue((int)(100*(float(a)/float(b))));
     }
-
 }
 void MainWindow::Work_Dlnow(QString txt)
 {
@@ -173,6 +175,7 @@ void MainWindow::on_pushButton_Exit_clicked()//关闭按钮被单击
     qDebug()<<"关闭按钮被单击";
     if(ttstart)
     {
+        disconnect(ttstart,&Start::log,0,0);
         ttstart->stopWork();
     }
     if(logUI)logUI->close();
@@ -336,9 +339,11 @@ void MainWindow::startThread(QString path)
     connect(ttstart, &Start::tworkMessageBox
             ,this, &MainWindow::Work_MessageBox);
     //connect(this,&MainWindow::stopTwork,ttstart,&Start::stopWork,Qt::DirectConnection);
+
     //日志窗口信号
     connect(ttstart,&Start::log
-            ,logUI,&logViewer::log);
+            ,logUI,&logViewer::log
+            ,Qt::BlockingQueuedConnection);
     //ui控制信号
     connect(ttstart, &Start::changeMainPage
             ,this, &MainWindow::changeMainPage);

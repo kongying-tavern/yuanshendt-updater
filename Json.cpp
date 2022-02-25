@@ -3,7 +3,7 @@
 
 
 #include "Sandefine.h"
-
+#include <Start.h>
 #include <iostream>
 
 JSON::JSON(QObject *parent)
@@ -45,7 +45,8 @@ void JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
    }
    jay = jdc.array();
    qDebug()<<"jaysize:"<<jay.size();
-   for(int i=0;i<jay.size();i++) {
+   for(int i=0;i<jay.size();i++)
+   {
        tp->stlog(moduleJson,
                     QString::number(i+1)+"/"+QString::number(jay.size())+"\t"+
                     jay.at(i).toObject()["MD5"].toString()+"\t"+
@@ -53,6 +54,8 @@ void JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
                     0);
        filePath<<jay.at(i).toObject()["filePath"].toString();
        fileMD5<<jay.at(i).toObject()["MD5"].toString();
+       emit tp->changeMainPage0label_Text("正在解析云端MD5\t"+QString::number(i)+"|"+QString::number(jay.size()));
+       emit tp->tworkProcess(i,jay.size());
    }
 }
 

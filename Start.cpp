@@ -253,7 +253,12 @@ void Start::work()
         emit log(moduleMD5,"本地文件:\t"+newFileList.at(i),NULL);
         emit log(moduleMD5,"本地MD5:\t"+omd5,NULL);
         emit tworkProcess(i,newFileList.size());
-        emit this->changeMainPage0label_Text("正在扫描本地文件MD5:"+newFileList.at(i));
+        emit this->changeMainPage0label_Text("正在扫描本地文件MD5: "
+                    +QString::number(i)
+                    +"|"
+                    +QString::number(newFileList.size())
+                    +"\n"+newFileList.at(i)
+                                             );
         if(newFileMD5.at(i) == omd5)
         {
             emit log(moduleMD5,"云端MD5\t"+newFileMD5.at(i),NULL);
@@ -273,6 +278,7 @@ void Start::work()
      * 下载文件前需要对字符串做很多工作
      * 一是反斜杠转斜杠并删除第一个斜杠
      */
+    emit tworkProcess(0,1);//进度条归零
     emit log(moduleStart,"根据本地文件MD5下载需要更新的文件",NULL);
     QString tem;
     emit this->changeProgressBarColor(
