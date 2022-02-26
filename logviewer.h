@@ -33,7 +33,8 @@ public:
     explicit logViewer(QWidget *parent = nullptr);
     ~logViewer();
 
-    vector<QTextEdit*> logTextEdit;
+    //vector<QTextEdit*> logTextEdit;
+    vector<QPlainTextEdit*> logTextEdit;
     vector<QJsonArray*> logJson;
     vector<logHTTP*> stlogHTTP;
 

@@ -1,15 +1,13 @@
 ﻿#include "logviewer.h"
 #include "ui_logviewer.h"
 
-#include <windows.h>
+#include <qt_windows.h>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QTextDocument>
 #include <QEvent>
-#include <QPropertyAnimation>
-
+#include <QTextDocument>
 #include "Sandefine.h"
 #define editw 4.5
 rectangle rectangle;
@@ -22,13 +20,12 @@ logViewer::logViewer(QWidget *parent) :
     ui->setupUi(this);
     for(int i=0;i<=5;i++)//初始化
     {
-        logTextEdit.push_back(new QTextEdit(this));
+        logTextEdit.push_back(new QPlainTextEdit(this));
         logJson.push_back(new QJsonArray);
     }
     rectangle.w=(int)(this->width()/6);
     for(int i=0;i<logTextEdit.size();++i)
     {
-        logTextEdit[i]->setAlignment(Qt::AlignTop);
         logTextEdit[i]->setReadOnly(true);
         logTextEdit[i]->installEventFilter(this);//事件钩子
         //动态响应初始化部分由showEvent完成
@@ -106,19 +103,21 @@ void logViewer::logUpdate(int c)
             }
             tem.append("---\r\n");
         }
-        logTextEdit[moduleHTTP]->setText(tem);
+        logTextEdit[moduleHTTP]->setPlainText(tem);
     }
         break;
-    default:
 
-        logTextEdit[c]->append(
-                    logJson[c]
-                    ->at(logJson[c]->size()-1)
+    default:
+        logTextEdit[c]->appendPlainText(
+                    logJson[c]->at(logJson[c]->size()-1)
                     .toObject()["log"]
-                .toString()
-                );
+                    .toString()
+                    );
+
     }
+    logTextEdit[c]->moveCursor(QTextCursor::End,QTextCursor::MoveAnchor);
 }
+
 void logViewer::resizeEvent(QResizeEvent *event)
 {
     rectangle.w=(int)(event->size().width()/6);
