@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QEvent>
 #include <QTextDocument>
+
 #include "Sandefine.h"
 #define editw 4.5
 rectangle rectangle;
@@ -85,12 +86,12 @@ void logViewer::log(int module,QString str,int mod=NULL)
 }
 void logViewer::logUpdate(int c)
 {
+
     QString tem;
     switch (c)
     {
     case moduleHTTP:
     {
-
         for(int y=0;y<stlogHTTP.size();++y)
         {
             for(int j=0;j<stlogHTTP[y]->log.size();++j)
