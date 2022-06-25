@@ -7,8 +7,7 @@
 #include <QtConcurrent>
 #include <QFileInfo>
 
-#include <windows.h>
-
+#include <qt_windows.h>
 #include "file.h"
 #include "MD5.h"
 #include "Sandefine.h"
@@ -132,6 +131,7 @@ QString tNowWork()
             if(i<2)tem+="\n";
         }
     }
+    QCoreApplication::processEvents();
     return tem;
 }
 void Start::updaterErr()
@@ -239,11 +239,11 @@ void Start::work()
 
     //    return;
     /*按需读取本地文件MD5**************************************************/
-    emit tworkProcess(0,1);//进度条归零
+    emit tworkProcess(1,1000);//进度条归零
     QStringList needUpdate;
     QStringList needUpdateMD5;
     qDebug()<<"按需读取本地文件MD5:"<<path;
-    emit log(moduleStart,"按需读取本地文件MD5",NULL);
+    emit this->log(moduleStart,"按需读取本地文件MD5",NULL);
     QString omd5;
     for(int i = 0; i< newFileList.size();++i)
     {

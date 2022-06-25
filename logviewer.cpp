@@ -1,6 +1,6 @@
 ﻿#include "logviewer.h"
 #include "ui_logviewer.h"
-
+#include <windows.h>
 #include <qt_windows.h>
 #include <QDebug>
 #include <QJsonDocument>
@@ -44,6 +44,7 @@ void logViewer::moveLogViewer(QPoint e,QPoint mainPoint)
 }
 void logViewer::log(int module,QString str,int mod=NULL)
 {
+    //return;
     switch (module)
     {
     case moduleHTTP:

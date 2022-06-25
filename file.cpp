@@ -349,7 +349,7 @@ bool moveFile(QString oldPath,QString newPath)
 }
 bool fileIsOpen(QString filePath)
 {
-
+return false;
 }
 
 QString dp0()

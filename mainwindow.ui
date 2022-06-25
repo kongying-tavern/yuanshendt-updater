@@ -52,7 +52,7 @@
      <string notr="true">background:rgb(255,255,255);</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page_Dling">
      <widget class="QLabel" name="label_Text">
@@ -127,7 +127,7 @@ background:rgb(58, 59, 64);
        <number>100</number>
       </property>
       <property name="value">
-       <number>0</number>
+       <number>50</number>
       </property>
       <property name="textVisible">
        <bool>false</bool>

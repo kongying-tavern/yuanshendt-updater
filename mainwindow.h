@@ -2,9 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//#include <windows.h>
+#include <windows.h>
 #include <qt_windows.h>
-#include <windowsx.h>
 #include <QtWidgets/QMessageBox>
 #include <QMouseEvent>
 #include <QtMath>

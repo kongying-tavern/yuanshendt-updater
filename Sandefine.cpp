@@ -1,7 +1,7 @@
 ﻿#include "Sandefine.h"
 #include <QDebug>
-
 #include <windows.h>
+#include <qt_windows.h>
 Sandefine::Sandefine()
 {
 

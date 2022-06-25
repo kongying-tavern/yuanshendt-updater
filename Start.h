@@ -6,7 +6,7 @@
 #include <QString>
 
 
-#include <Windows.h>
+//#include <Windows.h>
 
 #include <iostream>
 #include <io.h>

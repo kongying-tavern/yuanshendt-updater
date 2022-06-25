@@ -27,12 +27,9 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
     //qDebug()<<(pathStr);
     ui->setupUi(this);
     mutualUi = this;//托管初始化，非常重要
-
-
-
     this->setWindowFlag(Qt::FramelessWindowHint); // 无边框窗口
     setAttribute(Qt::WA_TranslucentBackground, true);  // 背景透明
-
+    qDebug()<<mutualUi;
     //仙哥版窗口阴影
     //设置窗口四周阴影 - label_Shadow实现
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect;
@@ -43,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent, QString pathStr)
 
     /*初始化logviewer*/
     //logViewer *logUI(new logViewer);
+
     logUI = new logViewer(this);
     logUI->setModal(false);
     logUI->setWindowTitle(_version);

@@ -1,11 +1,10 @@
-QT       += core gui
 QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #编译图标#管理员
 RC_FILE += my.rc
-CONFIG += c++17
+CONFIG += c++11
 #日志窗口
-#CONFIG +=console
+CONFIG +=console
 #日志输出
 DEFINES += QT_MESSAGELOGCONTEXT
 # The following define makes your compiler emit warnings if you use
@@ -22,7 +21,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 #多线程
 QT += concurrent
-QT += core
 #引用文件
 SOURCES += \
     HTTP.cpp \
@@ -73,7 +71,7 @@ DISTFILES += \
 
 #引用外部库
 TEMPLATE = app
-LIBS+= $$PWD"/curllib/libcurl-x64.dll"
+LIBS+= $$PWD"/curllib/libcurl.dll"
 
 
 win32: LIBS += -L$$PWD/curllib/ -lcurl
