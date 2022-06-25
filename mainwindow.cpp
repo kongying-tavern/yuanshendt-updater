@@ -20,6 +20,7 @@ QString workPath;
 MainWindow *MainWindow::mutualUi = nullptr;/*托管初始化，非常重要*/
 QPropertyAnimation * progressBaranimation = nullptr;//进度条动画
 QThread tprogressBaranimation;
+
 MainWindow::MainWindow(QWidget *parent, QString pathStr)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)

@@ -33,7 +33,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr, QString startPath = "");
     ~MainWindow();
-
 protected:
     /*bool nativeEvent(const QByteArray &eventType, void *message, long *result);*/
     /*窗口控制*/

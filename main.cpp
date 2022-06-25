@@ -7,7 +7,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-
 #include "HTTP.cpp"
 #include "MD5.cpp"
 #include "file.cpp"
@@ -201,11 +200,55 @@ LSTATUS RegSetValueExA(
     ::RegCloseKey(hkey);
     return re;
 }
-
+//转换为长路径
+QString shor2longPath(QString p)
+{
+    QString re;
+    int    len = MultiByteToWideChar(CP_ACP, 0, p.toLocal8Bit(), -1, NULL, 0);
+      LPWSTR buf = (LPWSTR)malloc(2*len);
+      if (buf) {
+        MultiByteToWideChar(CP_ACP, 0, p.toLocal8Bit(), -1, buf, len);
+        int plen = GetLongPathNameW(buf, NULL, 0);
+        LPWSTR buf2 = (LPWSTR)malloc(plen*2+2);
+        if (buf2) {
+          GetLongPathNameW(buf, buf2, plen);
+          //LPWSTR buf3 = wcsrchr((wchar_t*)buf2, L'\\')+1;
+          int ulen = WideCharToMultiByte(CP_UTF8, 0, buf2, -1, NULL, 0, NULL, NULL);
+          //int ulen = WideCharToMultiByte(CP_UTF8, 0, buf3, -1, NULL, 0, NULL, NULL);
+          if (ulen) {
+            std::string tmp;
+            tmp.resize(ulen-1);
+            WideCharToMultiByte(CP_UTF8, 0, buf2, -1, (LPSTR)tmp.c_str(), ulen-1, NULL, NULL);
+            //WideCharToMultiByte(CP_UTF8, 0, buf3, -1, (LPSTR)tmp.c_str(), ulen-1, NULL, NULL);
+            free(buf2);
+            free(buf);
+            return QString::fromStdString(tmp);
+          }
+          free(buf2);
+        }
+        free(buf);
+      }
+      return "";
+}
 int main(int argc, char *argv[])
 {
-    dpnx0=argv[0];
-    qDebug()<<dpnx0;
+    QApplication a(argc, argv);
+
+    logPath=getTempPath("temp")
+            +updaterTempDir
+            +"log/";
+    createFolderSlot(logPath);
+    logfilePath=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
+    logfile=new QFile(logfilePath);
+    logfile->open(QIODevice::WriteOnly | QIODevice::Append);
+    logstream=new QTextStream(logfile);
+    qInstallMessageHandler(MessageOutput);//启动日志
+    cleanLog();//清理旧日志
+    qDebug()<<"version"<<_version;
+    //处理短路径
+    dpnx0 = shor2longPath(QCoreApplication::applicationFilePath());
+    qDebug()<<"运行路径"<<dpnx0;
+    //return 0;
     QString tem="";
     QStringList argument;
     //传参时路径最后必须加反斜杠,头尾加双引号//很重要！
@@ -239,56 +282,38 @@ int main(int argc, char *argv[])
 
     }
     qDebug()<<QSysInfo::productType()<<QSysInfo::productVersion()<<QSysInfo::productVersion().toInt();//"windows" "10"
-    QString rootPath = "hkcu";
-    QString mainKey="Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
-    QString regv=regRead(HKEY_CURRENT_USER,
-                         mainKey,
-                         dpnx0.replace("/","\\")
-                         );
-    qDebug().noquote()<<"读取到的value"<<regv;
-
-
-    if(QSysInfo::productVersion().toInt()<10 && regv!="WIN7RTM")
+    if(QSysInfo::productVersion().toInt()<10)
     {
-        qDebug()<<"run in Windows8 or earlier";
-        QString value="WIN7RTM";
-        bool regb=regWrite(HKEY_CURRENT_USER,
-                           mainKey,
-                           dpnx0.replace("/","\\"),
-                           value
-                           );
-        if(regb)
+        QString rootPath = "hkcu";
+        QString mainKey="Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+        QString regv=regRead(HKEY_CURRENT_USER,
+                             mainKey,
+                             dpnx0.replace("/","\\")
+                             );
+        qDebug().noquote()<<"读取到的value"<<regv;
+        if(regv!="WIN7RTM")
         {
-            QProcess process;
-            process.setProgram(argv[0]);
-            process.setArguments(argument);
-            if(process.startDetached())
-            {return 0;}else{}
-        }else{
-            //弹窗警告
+            qDebug()<<"run in Windows8 or earlier";
+            QString value="WIN7RTM";
+            bool regb=regWrite(HKEY_CURRENT_USER,
+                               mainKey,
+                               dpnx0.replace("/","\\"),
+                               value
+                               );
+            if(regb)
+            {
+                QProcess process;
+                process.setProgram(argv[0]);
+                process.setArguments(argument);
+                if(process.startDetached())
+                {return 0;}else{}
+            }else{
+                //弹窗警告
+            }
         }
     }
-    logPath=getTempPath("temp")
-            +updaterTempDir
-            +"log/";
-    createFolderSlot(logPath);
-    logfilePath=logPath+QString::number(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
-    logfile=new QFile(logfilePath);
-    logfile->open(QIODevice::WriteOnly | QIODevice::Append);
-    logstream=new QTextStream(logfile);
-    qInstallMessageHandler(MessageOutput);//启动日志
-    cleanLog();//清理旧日志
-    qDebug()<<"version"<<_version;
-
-    //qDebug()<<"工作路径"<<QString(logPath);
-
-    //qDebug()<<argc;
-    //qDebug()<<argv[0];
-
-    //qDebug()<<dpnx0;
 
     qDebug()<<"传参路径："<<tem;
-    QApplication a(argc, argv);
     MainWindow w(NULL,tem);
     w.show();
     return a.exec();
