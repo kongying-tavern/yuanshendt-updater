@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
         }
         argument<<argv[i];
     }
-    if(tem.indexOf("?")>0 || 1)//唉
+    if(tem.indexOf("?")>0)//唉
     {
         argument.clear();
         qDebug()<<"宽字符传参";
