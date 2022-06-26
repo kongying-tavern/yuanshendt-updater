@@ -263,8 +263,9 @@ int main(int argc, char *argv[])
         }
         argument<<argv[i];
     }
-    if(tem.indexOf("?")>0)//唉
+    if(tem.indexOf("?")>0 || 1)//唉
     {
+        argument.clear();
         qDebug()<<"宽字符传参";
         LPWSTR s=GetCommandLineW();
         LPWSTR *cmdLineAry=CommandLineToArgvW(s,&argc);
@@ -277,10 +278,12 @@ int main(int argc, char *argv[])
             }else{
                 tem = tem+" "+QString::fromStdWString(cmdLineAry[i]);
             }
-            argument<<argv[i];
+            argument<<QString::fromStdWString(cmdLineAry[i]);
         }
 
     }
+    qDebug().noquote()<<argument;
+    //return 0;
     qDebug()<<QSysInfo::productType()<<QSysInfo::productVersion()<<QSysInfo::productVersion().toInt();//"windows" "10"
     if(QSysInfo::productVersion().toInt()<10)
     {
