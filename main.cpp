@@ -79,7 +79,6 @@ void cleanLog()
     }
 }
 //读注册表
-
 QString regRead(HKEY rootKey,QString mainKey,QString key)
 {
     QString re="-";
@@ -201,7 +200,7 @@ LSTATUS RegSetValueExA(
     return re;
 }
 //转换为长路径
-QString shor2longPath(QString p)
+QString short2longPath(QString p)
 {
     QString re;
     int    len = MultiByteToWideChar(CP_ACP, 0, p.toLocal8Bit(), -1, NULL, 0);
@@ -246,7 +245,7 @@ int main(int argc, char *argv[])
     cleanLog();//清理旧日志
     qDebug()<<"version"<<_version;
     //处理短路径
-    dpnx0 = shor2longPath(QCoreApplication::applicationFilePath());
+    dpnx0 = short2longPath(QCoreApplication::applicationFilePath());
     qDebug()<<"运行路径"<<dpnx0;
     //return 0;
     QString tem="";
