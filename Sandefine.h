@@ -2,8 +2,11 @@
 #define SANDEFINE_H
 #include <QString>
 /*云端服务器***********************************************************************/
-#define dlurl "http://download.yuanshen.site/"
-#define dlurlMap "http://download.yuanshen.site/Map/"
+//#define dlurl "http://download.yuanshen.site/"
+//#define dlurlMap "http://download.yuanshen.site/Map/"
+/*云端服务器*20220723更改***********************************************************/
+#define dlurl "http://download.yuanshen.site/d_0/"
+#define dlurlMap "http://download.yuanshen.site/d_0/Map/"
 /*测试版云端服务器******************************************************************/
 //#define dlurl "http://download.yuanshen.site/testMap/"
 //#define dlurlMap "http://download.yuanshen.site/testMap/Map/"
