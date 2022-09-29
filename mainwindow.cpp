@@ -364,14 +364,15 @@ void MainWindow::startThread(QString path)
 }
 void MainWindow::updataDlingmag()
 {
-    MainWindow::changeMainPage0label_Text(tNowWork());
+    if(ttstart)MainWindow::changeMainPage0label_Text(ttstart->tNowWork());
 }
 void MainWindow::timerEvent(QTimerEvent *event)
 {
     //qDebug()<<"timerShot:"<<event->timerId();
-    if(event->timerId()==timer1)
+    if(event->timerId()==timer1 && ttstart->isdling)
     {
-        QString tem =tNowWork();
+        QString tem;
+        if(ttstart)tem = ttstart->tNowWork();
         //if(tem!="")ui->label_Dlnow->setText(tem);
         if(tem!="")MainWindow::changeMainPage0label_Text(tem);
     }

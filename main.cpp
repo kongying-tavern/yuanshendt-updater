@@ -60,9 +60,9 @@ void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QStr
 #else
     logstream->setEncoding(QStringConverter::Utf8);
 #endif
-    QString jsonstr= QJsonDocument(joc).toJson();
+    QString jsonstr= QJsonDocument(joc).toJson().replace("\\\\","\\").replace("\\\"","\"");
     //stream->
-    *logstream <<jsonstr.toUtf8().toBase64()+"\n";
+    *logstream <<jsonstr.toUtf8()+"\n";
     logstream->flush();//强制写出
     //logfile.close();
     // 解锁
@@ -202,7 +202,6 @@ LSTATUS RegSetValueExA(
 //转换为长路径
 QString short2longPath(QString p)
 {
-    QString re;
     int    len = MultiByteToWideChar(CP_ACP, 0, p.toLocal8Bit(), -1, NULL, 0);
       LPWSTR buf = (LPWSTR)malloc(2*len);
       if (buf) {
@@ -284,7 +283,7 @@ int main(int argc, char *argv[])
     qDebug().noquote()<<argument;
     //return 0;
     qDebug()<<QSysInfo::productType()<<QSysInfo::productVersion()<<QSysInfo::productVersion().toInt();//"windows" "10"
-    if(QSysInfo::productVersion().toInt()<10)
+    if(QSysInfo::productVersion().toInt()<10)//只做win7 不做win7sp1 还有XP给爷死  //不会还有人用win8吧不会吧不会吧不会吧
     {
         QString rootPath = "hkcu";
         QString mainKey="Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";

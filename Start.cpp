@@ -15,6 +15,7 @@
 #include "mainwindow.h"
 
 Start *tp;
+
 Start::Start(QString dir, QObject *parent)
     : QObject(parent)
 {
@@ -41,11 +42,15 @@ Start::~Start()
 
 void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
 {
+    static QMutex mutex;
+    mutex.lock();
+
+    //qDebug()<<dlnow<<dltotal<<tid<<path;
     for(int i=0;i<maxDlThreah;++i)
     {
         //清理已完成的任务
         //if(netspeed[i].dl==netspeed[i].total && netspeed[i].total>0)
-        if( netspeed[i].isdling==true && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
+        if( netspeed[i].isdling && (netspeed[i].dl==netspeed[i].total && netspeed[i].total>0))
         {
             qDebug()<<&netspeed[i].tid<<"end dl"<<netspeed[i].path;
             netspeed[i].isdling=false;
@@ -53,36 +58,40 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
             //netspeed[i].dl=0;
             //netspeed[i].hisDl=0;
             //netspeed[i].total=0;
+            //netspeed[i].dlt=0;
+            //netspeed[i].hisDlt=netspeed[i].dlt;
             //netspeed[i].path="";
-            emit tp->updataDlingmag();//强制更新进度文本
+            //emit tp->updataDlingmag();//强制更新进度文本
         }
     }
-    for(int i=0;i<3;++i)
+    for(int i=0;i<maxDlThreah;++i)
     {
-
-        if(netspeed[i].tid==NULL && path!="")
+        //qDebug()<<i<<netspeed[i].tid<<tid;
+        if(netspeed[i].isdling==false)
         {
             //新下载线程开始
             qDebug()<<&tid<<"new dl"<<path;
             netspeed[i].isdling=true;
             netspeed[i].tid=tid;
-            netspeed[i].dl=0;
+            netspeed[i].dl=dlnow;
             netspeed[i].dlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
-            netspeed[i].hisDl=0;
-            netspeed[i].hisDlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
-            netspeed[i].total=0;
-            netspeed[i].path=path;
+            netspeed[i].hisDl=dlnow;
+            netspeed[i].hisDlt=netspeed[i].dlt;
+            netspeed[i].total=dltotal;
+            if(path!="")netspeed[i].path=path;
             break;
         }
-        if(netspeed[i].tid==tid)
+        if(netspeed[i].tid==tid && netspeed[i].isdling)
         {
             //正在下载的线程
+            //qDebug()<<"update netspeed"<<tid<<dlnow<<dltotal<<path<<netspeed[i].path;
             netspeed[i].dl=dlnow;
             netspeed[i].dlt=QDateTime::currentDateTime().toMSecsSinceEpoch();
             netspeed[i].total=dltotal;
             break;
         }
     }
+    mutex.unlock();
 }
 void Start::stlog(int module,QString str,int mod=NULL)
 {
@@ -90,47 +99,52 @@ void Start::stlog(int module,QString str,int mod=NULL)
 }
 void Start::dldone()
 {
-
     emit tworkProcess(doneFile++,totalFile);
     tp->stlog(moduleStart,"下载完成 "+
               QString::number(doneFile)+"/"+
               QString::number(totalFile)
               ,NULL);
 }
-QString tNowWork()
+QString Start::tNowWork()
 {
+    qDebug()<<"update speed text";
     //return "";
     qint64 DETLAms;
     int p;
     LONG64 s;
     QString tem="";
     QString tems="0.00B/s";
-    for(int i=0;i<3;++i)
+    for(int i=0;i<maxDlThreah;++i)
     {
         if(netspeed[i].path!="")
         {
+            //qDebug()<<"--------------";
             //计算已下载的百分比
             DETLAms=netspeed[i].dlt-netspeed[i].hisDlt;
+            //qDebug().noquote()<<i<<netspeed[i].path<<netspeed[i].dl<<netspeed[i].hisDl<<DETLAms;
             p = (int)(100*((double)netspeed[i].dl/(double)netspeed[i].total));
             if(p<0)p=0;
-
+            //qDebug().noquote()<<p;
             //下载速度格式化
             //s = (netspeed[i].dl-netspeed[i].hisDl)*2;
             s=(int)((double)(netspeed[i].dl-netspeed[i].hisDl)*((double)1000/(double)DETLAms));
             if(s>0)tems=conver(s);
-            //下载信息构造
+            //qDebug().noquote()<<tems;
+            //文本构造
             tem+=QString::number(p)+"%\t | "
                  +QString(tems)+"\t | "
                  +netspeed[i].path
                     ;
-            //下载字节数缓存
+            //字节数缓存
             netspeed[i].hisDl=netspeed[i].dl;
             netspeed[i].hisDlt=netspeed[i].dlt;
             p=0;
-            tems="0.00B/s";
+
             if(i<2)tem+="\n";
         }
+        tems="0.00B/s";
     }
+    //qDebug().noquote()<<tem;
     QCoreApplication::processEvents();
     return tem;
 }
@@ -217,7 +231,9 @@ void Start::work()
      */
     tp->stlog(moduleStart,"\r\n获取在线文件MD5json",NULL);
     emit this->changeMainPage0label_Text("获取在线文件MD5...");
+    isdling = 1;
     http->httpDownLoad(dlurl"md5.json","md5.json");
+    isdling = 0;
     /*读取在线文件md5.json到
       * QJson  newmd5.json
       * 字符串  QString newMD5Str
@@ -294,7 +310,7 @@ void Start::work()
     tpoolhttp->setMaxThreadCount(maxDlThreah);
     //tpoolhttp->setMaxThreadCount(needUpdate.size());//A8:我tm谢谢你
     tpoolhttp->setExpiryTimeout(-1);
-
+    isdling = 1;
     for(int i = 0; i< needUpdate.size();++i)
     {
         if(needUpdateMD5.at(i)!=getFlieMD5(tempPath+"download/Map/"+needUpdate.at(i)))
@@ -327,6 +343,7 @@ void Start::work()
     //tpoolhttp->activeThreadCount();
     tpoolhttp->dumpObjectTree();
     tpoolhttp->waitForDone(-1);
+    isdling = 0;
     tpoolhttp->clear();
     qDebug()<<"下载完成";
     tp->stlog(moduleStart,"下载完成",NULL);

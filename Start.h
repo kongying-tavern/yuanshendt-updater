@@ -43,10 +43,13 @@ public:
     void updaterErr();
     void relaytworkMessageBox(int tag,QString title,QString txt);
     void stopWork();
+    QString tNowWork();
+    bool isdling;
 public:
 
     static void dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path);
     static void stlog(int module,QString str,int mod);
+
 private:
 
     QThread *workProcess = nullptr;
@@ -79,7 +82,7 @@ signals:
     void changePBText(QString str);//修改按钮文本
     void updataDlingmag();//强制刷新进度文本
 };
-QString tNowWork();
+
 
 
 
