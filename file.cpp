@@ -212,7 +212,7 @@ QStringList getUptater(QStringList localFilePath
 }
 bool moveFile(QString oldPath,QString newPath)
 {
-    int err;
+    int err = 0;
     Start::stlog(modulefile,
                  "更新文件\t"+oldPath,
                  0);
@@ -231,7 +231,7 @@ bool moveFile(QString oldPath,QString newPath)
         Start::stlog(modulefile,
                      "检查文件属性\t",
                      0);
-        qDebug()<<"文件为只读";
+        qDebug()<<"检查文件属性";
         SetLastError(err);
         DWORD FileAttributes=GetFileAttributesW((LPCWSTR)newPath.replace("/","\\").unicode());
         if(FileAttributes)
@@ -241,7 +241,7 @@ bool moveFile(QString oldPath,QString newPath)
                 Start::stlog(modulefile,
                              "文件为只读\tFILE_ATTRIBUTE_READONLY",
                              0);
-                qDebug()<<"文件为只读";
+                qDebug()<<"文件为只读\tFILE_ATTRIBUTE_READONLY";
                 SetLastError(err);
                 SetFileAttributesW(
                             (LPCWSTR)newPath.replace("/","\\").unicode()
