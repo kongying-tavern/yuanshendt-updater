@@ -50,7 +50,7 @@
 "https://yuanshen.site/docs/download-client.html"
 
 /*moduleCode********************************************/
-#define _version "v1.4.1"
+#define _version "v1.4.2"
 #define MD5jsonVersion 1
 #define modulemainWindows 0
 #define moduleStart 1
