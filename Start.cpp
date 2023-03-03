@@ -32,6 +32,7 @@ Start::Start(QString dir, QObject *parent)
     workProcess->start();
     this->dir = dir;
 
+
 }
 
 Start::~Start()
@@ -95,7 +96,20 @@ void Start::dlworking(LONG64 dlnow,LONG64 dltotal,void *tid,QString path)
 }
 void Start::stlog(int module,QString str,int mod=NULL)
 {
-    if(tp) emit tp->log(module,str,mod);
+    if(tp)
+    {
+        emit tp->log(module,str,mod);
+        tp->newLog(module,str);
+    }
+
+}
+void Start::newLog(int module,QString log)
+{
+    qDebug()<<"llog"<<module<<log;
+    llog * l = new llog;
+    l->module = module;
+    l->log = log;
+    logList.push_back(l);
 }
 void Start::dldone()
 {
@@ -151,13 +165,47 @@ QString Start::tNowWork()
 void Start::updaterErr()
 {
     tp->stlog(moduleStart,"自动更新失败",NULL);
+    QString str = "";
+    int j = 0;
+    qDebug()<<logList.size();
+    for(int i = logList.size()-1;i>=0 && j++<10;i--)
+    {
+        str += "\n";
+        switch(logList.at(i)->module)
+        {
+            case modulemainWindows:
+                    str += "modulemainWindows";
+            break;
+            case moduleStart:
+                    str += "moduleStart";
+            break;
+            case moduleHTTP:
+                    str += "moduleHTTP";
+            break;
+            case modulefile:
+                    str += "modulefile";
+            break;
+            case moduleMD5:
+                    str += "moduleMD5";
+            break;
+            case moduleJson:
+                    str += "moduleJson";
+            break;
+        }
+        str += " | ";
+        str += logList.at(i)->log;
+    }
     emit tworkProcess(0,1);
     emit this->changePBText("自动更新失败,请单击重试");
     emit tworkFinished(false);
     emit this->changeMainPage(1,false);
     emit tworkMessageBox(1,
                          "自动更新失败",
-                         uperr_new);
+                         QString(uperr_new)
+                         +"\n"
+                         "最后十条日志"+
+                         str
+                         );
 }
 void Start::stopWork()
 {
@@ -411,6 +459,7 @@ void Start::work()
     emit this->changeMainPage(1,true);
     emit tworkFinished(true);
     tp->stlog(moduleStart,"更新流程结束",NULL);
+    //Start::updaterErr();
 }
 
 

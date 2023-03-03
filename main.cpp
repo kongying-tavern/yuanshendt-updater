@@ -14,14 +14,11 @@
 
 #include <qt_windows.h>
 
-
-
 void MessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 
     qDebug().noquote()<<msg;//调试窗输出
     QJsonObject joc;
-    QJsonArray jay;
     switch(type)
     {
         case QtDebugMsg:
