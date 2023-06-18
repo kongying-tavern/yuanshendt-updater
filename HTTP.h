@@ -9,6 +9,8 @@
 //#define CURL_STATICLIB
 #include "curllib\curl.h"
 
+
+
 static QString crtPath;
 class HTTP : public QObject, public QRunnable
 {
@@ -41,11 +43,10 @@ class HTTP : public QObject, public QRunnable
     private slots:
 
     signals:
-        void tworkMessageBox(int tag,QString title,QString txt);
+        void tworkMessageBox(int tag,QString title,QString txt,bool modal = false);
         void dldone();
 };
 void httpcrt();
-
 
 QString conver(LONG64 l);
 

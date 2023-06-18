@@ -68,7 +68,7 @@ public:
 
 
     void Work_Dlnow(QString txt);
-    void Work_MessageBox(int tag,QString title,QString txt);//信息框
+    void Work_MessageBox(int tag,QString title,QString txt,bool modal = false);//信息框
     /*多线程*/
     void threadWork(QString path);
     void startThread(QString path);

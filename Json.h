@@ -22,7 +22,7 @@ public:
     Start *tp = nullptr;
 
 public:
-    void jsonStr2QSL(QString QSL,QStringList &filePath,QStringList &fildMD5);
+    bool jsonStr2QSL(QString QSL,QStringList &filePath,QStringList &fildMD5);
 
 };
 

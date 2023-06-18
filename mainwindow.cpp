@@ -250,30 +250,22 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
     //返回空对象则没选
     //选择了目录则返回QString
     logUI->log(modulemainWindows,"on_pushButton_Start_clicked()",NULL);
+
     if(alldone)
     {
         logUI->log(modulemainWindows,"尝试打开空荧地图",NULL);
         logUI->log(modulemainWindows,"start "+workPath+"/Map.exe",NULL);
         qDebug()<<QString("start "+workPath+"/Map.exe");
-        QProcess process(this);
-        QStringList argument;
-        /*
-        process.setProgram("cmd");
-        argument <<"/c"
-                 <<"start"
-                 <<""""
-                 <<workPath+"/Map.exe"
-                   ;
-        */
+        QProcess process(NULL);
+        //QStringList argument;
         QString e=workPath+"/Map.exe";
         process.setProgram(e);
-        process.setArguments(argument);
-        argument <<"/c";
+        process.setWorkingDirectory(workPath);
         if(process.startDetached())
         {
             qDebug()<<"start √";
             logUI->log(modulemainWindows,"这句日志看不到了",NULL);
-            QApplication* app;
+            QApplication* app = nullptr;
             app->exit(0);
         }else{
             qDebug()<<"start ×";
@@ -321,13 +313,11 @@ void MainWindow::startThread(QString path)
     ui->MainPage->setCurrentIndex(0);
     //startUpdate(path);
     //正经多线程
-    if (ttstart != nullptr)
+    if (ttstart == nullptr)
     {
-        delete ttstart;
+        logUI->log(modulemainWindows,"新建线程",NULL);
+        ttstart = new Start(path, NULL);
     }
-    //创建多线程工作对象
-    logUI->log(modulemainWindows,"新建线程",NULL);
-    ttstart = new Start(path, NULL);
 
     //连接工作触发信号
     //connect(Start, &Start::workError, this, &MainWindow::Work_Error);
@@ -384,7 +374,7 @@ void MainWindow::Work_Finished(bool done)
     logUI->log(modulemainWindows,"删除计时器",NULL);
     killTimer(timer1);
 }
-void MainWindow::Work_MessageBox(int tag,QString title,QString txt)
+void MainWindow::Work_MessageBox(int tag,QString title,QString txt,bool modal)
 {
     logUI->log(modulemainWindows,"非模态对话框 "+QString::number(tag),NULL);
     QMessageBox *box=new QMessageBox(this);
@@ -404,7 +394,7 @@ void MainWindow::Work_MessageBox(int tag,QString title,QString txt)
     box->setText(txt);
     box->setStandardButtons(QMessageBox::Ok);
     box->setAttribute(Qt::WA_DeleteOnClose);
-    box->setModal(false);//非模态
+    box->setModal(modal);//非模态
     box->setTextInteractionFlags(Qt::TextSelectableByMouse);
     box->show();
 }

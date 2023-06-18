@@ -78,7 +78,7 @@ class Start : public QObject
         //void tworkError(int errorCode);
         void tworkProcess(int a,int b);
         void tworkFinished(bool done);
-        void tworkMessageBox(int tag,QString title,QString txt);
+        void tworkMessageBox(int tag,QString title,QString txt,bool modal = false);
     signals:
         /*窗口控制托管信号*/
         void changeMainPage(int page,bool done=false);/*修改MainPage,0:进度条 1:选择目录按钮*/

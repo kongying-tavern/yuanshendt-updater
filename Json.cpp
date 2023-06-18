@@ -14,7 +14,7 @@ JSON::~JSON()
 {
 
 }
-void JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
+bool JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
 {
 
    QByteArray qa;
@@ -42,6 +42,7 @@ void JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
    }
    if(jdc.isEmpty()){
        tp->stlog(moduleJson,QString("json基础类型:Empty"),0);
+       return false;
    }
    jay = jdc.array();
    qDebug()<<"jaysize:"<<jay.size();
@@ -57,5 +58,6 @@ void JSON::jsonStr2QSL(QString QS,QStringList &filePath,QStringList &fileMD5)
        emit tp->changeMainPage0label_Text("正在解析云端MD5\t"+QString::number(i)+"|"+QString::number(jay.size()));
        emit tp->tworkProcess(i,jay.size());
    }
+   return true;
 }
 

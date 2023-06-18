@@ -299,7 +299,17 @@ void Start::work()
     tp->stlog(moduleStart,"格式化MD5List",NULL);
     JSON *json=new JSON();
     json->tp=tp;
-    json->jsonStr2QSL(newMD5Str,newFileList,newFileMD5);
+    if(!json->jsonStr2QSL(newMD5Str,newFileList,newFileMD5))
+    {
+        emit tworkMessageBox(
+                    1,
+                    "请检查互联网链接",
+                    "rt"
+                    );
+        emit this->changeMainPage(1,false);
+        emit tworkFinished(false);
+        return;
+    }
 
     //    return;
     /*按需读取本地文件MD5**************************************************/
