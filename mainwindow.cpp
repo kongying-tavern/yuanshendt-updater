@@ -272,7 +272,7 @@ void MainWindow::on_pushButton_Start_clicked() /*选择安装文件夹后file_se
             logUI->log(modulemainWindows,"start ×",NULL);
             QMessageBox::information(this,
                                      "出了点问题",
-                                     "请手动打开空荧地图/n能搞出这个提示San表示San也不知道怎么回事"
+                                     "请手动打开空荧地图\n能搞出这个提示San表示San也不知道怎么回事"
                                      );
         }
 
